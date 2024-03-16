@@ -1,0 +1,20 @@
+version: '3'
+services:
+
+  db.mysql.soundcloud.main:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/mysql
+    container_name: db.mysql.soundcloud.main
+    volumes:
+      - ./volumes/db/mysql/soundcloud/main:/var/lib/mysql
+    env_file:
+      - .env
+    ports:
+      - '3306:3306'
+    networks:
+      - sound_net
+
+networks:
+  sound_net:
+    driver: bridge
