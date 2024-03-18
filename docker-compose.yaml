@@ -15,6 +15,21 @@ services:
     networks:
       - sound_net
 
+  storage.minio.soundcloud:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/minio
+    container_name: storage.minio.soundcloud
+    volumes:
+      - ./volumes/storage/minio/soundcloud:/var/lib/minio
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - sound_net
+
 networks:
   sound_net:
     driver: bridge

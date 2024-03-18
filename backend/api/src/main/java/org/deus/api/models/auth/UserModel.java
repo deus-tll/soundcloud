@@ -31,6 +31,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -44,16 +46,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Table(name = "users")
 @Schema(description = "User Model")
 public class UserModel  extends BaseEntity implements UserDetails {
+    @Size(min = 5, max = 50, message = "The username must be between 5 and 50 characters long")
+    @NotBlank(message = "The username cannot be empty")
+    @Pattern(regexp = "^[a-z0-9_.]+$", message = "The username must only contain lowercase letters, numbers, underscores and dots")
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true)
-    @Email
-    @Schema(description = "User's email address", example = "none@none.com")
+    @Schema(description = "E-mail address", example = "johndoe@gmail.com")
+    @Size(min = 5, max = 255, message = "The email address must contain between 5 and 255 characters")
+    @NotBlank(message = "The e-mail address cannot be empty")
+    @Email(message = "E-mail address should be in the format user@example.com")
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Schema(description = "User password (mast have [A-Z],[a-z], [0-9], >6 )", example = "QweAsdZxc_23")
-    @Size(min = 6, max = 100)
+    @Schema(description = "Password", example = "my_1secret1_password")
+    @Size(min = 5, max = 60, message = "The password must contain between 5 and 60 characters")
+    @NotBlank(message = "The password address cannot be empty")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
