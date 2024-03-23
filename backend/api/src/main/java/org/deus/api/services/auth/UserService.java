@@ -1,8 +1,10 @@
 package org.deus.api.services.auth;
 
+import org.deus.api.exceptions.StatusException;
 import org.deus.api.models.auth.UserModel;
 import org.deus.api.repositories.UserRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,13 +21,13 @@ public class UserService {
         return repository.save(user);
     }
 
-    public UserModel create(UserModel user) {
+    public UserModel create(UserModel user) throws StatusException {
         if (repository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("A user with this name already exists");
+            throw new StatusException("A user with this name already exists", HttpStatus.CONFLICT);
         }
 
         if (repository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("A user with this email already exists");
+            throw new StatusException("A user with this email already exists", HttpStatus.CONFLICT);
         }
 
         return this.save(user);

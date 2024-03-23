@@ -1,5 +1,6 @@
 package org.deus.api.controllers.auth;
 
+import org.deus.api.exceptions.StatusException;
 import org.deus.api.services.auth.AuthenticationService;
 import org.deus.api.services.auth.UserService;
 import org.deus.api.dtos.auth.UserDTO;
@@ -31,13 +32,13 @@ public class AuthController {
 
     @Operation(summary = "User registration in the system")
     @PostMapping("/sign-up")
-    public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUpRequest request) {
+    public JwtAuthenticationResponse signUp(@RequestBody @Valid SignUpRequest request) throws StatusException {
         return authenticationService.signUp(request);
     }
 
     @Operation(summary = "User login to the system")
     @PostMapping("/sign-in")
-    public JwtAuthenticationResponse signIn(@RequestBody @Valid SignInRequest request) {
+    public JwtAuthenticationResponse signIn(@RequestBody @Valid SignInRequest request) throws StatusException {
         return authenticationService.signIn(request);
     }
 
