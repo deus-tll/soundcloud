@@ -1,6 +1,7 @@
 package org.deus.api.controllers;
 
 import org.deus.api.ApiApplication;
+import org.deus.api.enums.FileType;
 import org.deus.api.services.storages.StorageTempService;
 
 import org.springframework.http.HttpStatus;
@@ -62,7 +63,8 @@ public class UploadController {
         }
 
         if (!uploadInfo.isUploadInProgress()) {
-            this.storageTempService.putContent(uploadURI, metadata);
+            FileType fileType = determineFileType(uploadInfo.getFileMimeType());
+            this.storageTempService.putContent(uploadURI, metadata, fileType);
         }
     }
 
@@ -89,5 +91,16 @@ public class UploadController {
             }
         }
         return true;
+    }
+
+    private FileType determineFileType(String mimeType) {
+        if (mimeType != null) {
+            if (mimeType.startsWith("audio/")) {
+                return FileType.AUDIO;
+            } else if (mimeType.startsWith("video/")) {
+                return FileType.VIDEO;
+            }
+        }
+        return FileType.UNKNOWN;
     }
 }
