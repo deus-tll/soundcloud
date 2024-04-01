@@ -116,6 +116,13 @@
 			<artifactId>minio</artifactId>
 			<version>8.5.9</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>me.desair.tus</groupId>
+			<artifactId>tus-java-server</artifactId>
+			<version>1.0.0-3.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
