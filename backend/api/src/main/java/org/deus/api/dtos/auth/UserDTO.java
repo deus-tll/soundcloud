@@ -3,10 +3,12 @@ package org.deus.api.dtos.auth;
 import org.deus.api.models.auth.RoleEnum;
 import org.deus.api.models.auth.UserModel;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class UserDTO {
+public class UserDTO implements Serializable {
     private final Long id;
     private final String username;
     private final String email;

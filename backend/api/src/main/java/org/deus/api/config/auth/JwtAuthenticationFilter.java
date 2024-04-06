@@ -1,10 +1,5 @@
 package org.deus.api.config.auth;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.deus.api.services.auth.JwtService;
 import org.deus.api.services.auth.UserService;
 
@@ -15,11 +10,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.lang.NonNull;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
+
+import lombok.RequiredArgsConstructor;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 @RequiredArgsConstructor
