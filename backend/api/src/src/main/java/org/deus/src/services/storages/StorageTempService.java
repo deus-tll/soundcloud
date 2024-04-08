@@ -3,6 +3,7 @@ package org.deus.src.services.storages;
 import org.deus.src.SrcApplication;
 import org.deus.src.storages.drivers.StorageDriverInterface;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
@@ -23,17 +24,25 @@ import io.minio.errors.*;
 public class StorageTempService {
     private final StorageDriverInterface storage;
     private final TusFileUploadService tusFileUploadService;
+    private final SimpMessagingTemplate messagingTemplate;
     private final String tempBucketName = "temp_files";
 
     private String buildPath(long userId, String fileId) {
         return "/" + userId + "/" + fileId + "/originalBytes";
     }
 
-    public void putContent(long userId, String uploadURI, Map<String, String> metadata) {
+    public void putContent(long userId, String username, String uploadURI, Map<String, String> metadata) {
         try (InputStream inputStream = this.tusFileUploadService.getUploadedBytes(uploadURI)) {
             String fileId = metadata.get("fileId");
             byte[] fileBytes = inputStream.readAllBytes();
+
             storage.put(tempBucketName, buildPath(userId, fileId), fileBytes);
+
+            messagingTemplate.convertAndSendToUser(
+                    username,
+                    "/topic/tempfile-uploaded",
+                    "The file is completely uploaded to the temp storage. Proceed with your next action associated with this file."
+            );
         }
         catch (IOException | TusException | ServerException | InsufficientDataException | ErrorResponseException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
