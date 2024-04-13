@@ -1,32 +1,52 @@
 package org.deus.soundcloudspringbootstarter.config.storage;
 
 import io.minio.MinioClient;
+import org.deus.soundcloudspringbootstarter.config.storage.properties.MinioStorageProperties;
+import org.deus.soundcloudspringbootstarter.config.storage.properties.S3StorageProperties;
+import org.deus.soundcloudspringbootstarter.enums.StorageEnum;
 import org.deus.soundcloudspringbootstarter.storages.drivers.StorageDriverInterface;
 import org.deus.soundcloudspringbootstarter.storages.drivers.StorageMinioDriver;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 @Configuration
+@EnableConfigurationProperties({MinioStorageProperties.class, S3StorageProperties.class})
+@PropertySource(value = "classpath:custom.properties")
 public class StorageConfiguration {
 
-    @Value("${storage.minio.endpoint}")
-    private String endpoint;
+    private final MinioStorageProperties minioStorageProperties;
+    private final S3StorageProperties s3StorageProperties;
 
-    @Value("${storage.minio.access.key}")
-    private String accessKey;
-
-    @Value("${storage.minio.secret.key}")
-    private String secretKey;
+    @Autowired
+    public StorageConfiguration (MinioStorageProperties minioStorageProperties, S3StorageProperties s3StorageProperties) {
+        this.minioStorageProperties = minioStorageProperties;
+        this.s3StorageProperties = s3StorageProperties;
+    }
 
     @Bean
     public StorageDriverInterface StorageService() {
-        MinioClient client =
-                MinioClient.builder()
-                        .endpoint(endpoint)
-                        .credentials(accessKey, secretKey)
-                        .build();
+        StorageEnum currentMainStorage = StorageEnum.MINIO;
+        StorageDriverInterface storageClient = null;
 
-        return new StorageMinioDriver(client);
+        switch (currentMainStorage) {
+            case MINIO -> {
+                MinioClient client =
+                        MinioClient.builder()
+                                .endpoint(minioStorageProperties.getEndpoint())
+                                .credentials(minioStorageProperties.getAccessKey(), minioStorageProperties.getSecretKey())
+                                .build();
+
+                storageClient = new StorageMinioDriver(client);
+            }
+
+            case S3 -> {
+
+            }
+        }
+
+        return storageClient;
     }
 }
