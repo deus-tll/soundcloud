@@ -4,15 +4,12 @@ import org.deus.src.SrcApplication;
 import org.deus.src.config.AppProperties;
 import org.deus.src.enums.FileType;
 import org.deus.src.services.auth.UserService;
-import org.deus.src.services.storages.StorageTempService;
 
+import org.deus.src.services.storages.StorageTempService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -91,6 +88,20 @@ public class UploadController {
         String fileId = UUID.randomUUID().toString();
         return new ResponseEntity<>(fileId, HttpStatus.CREATED);
     }
+
+    @GetMapping("/check-file/{fileId}")
+    public ResponseEntity<?> checkFile(@PathVariable String fileId) {
+        boolean isFileExists = false;
+
+        try {
+            isFileExists = this.storageTempService.isFileExists(userService.getCurrentUser().getId(), fileId);
+        } catch (Exception e) {
+            SrcApplication.logger.error("", e);
+        }
+
+        return new ResponseEntity<>(isFileExists, HttpStatus.OK);
+    }
+
 
     private boolean checkMetadata(Map<String, String> metadata, HttpServletResponse servletResponse, String... requiredKeys) throws IOException {
         for (String key : requiredKeys) {
