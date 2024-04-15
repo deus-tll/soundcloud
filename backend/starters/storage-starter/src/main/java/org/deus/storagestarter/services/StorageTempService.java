@@ -55,7 +55,7 @@ public class StorageTempService {
         catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.error("Error while deleting uploaded data", e);
+            logger.error("Error while getting original bytes of data", e);
             throw new RuntimeException(e);
         }
     }
