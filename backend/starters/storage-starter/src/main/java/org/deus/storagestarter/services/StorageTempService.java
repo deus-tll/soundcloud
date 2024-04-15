@@ -38,13 +38,13 @@ public class StorageTempService {
         catch (IOException | ServerException | InsufficientDataException | ErrorResponseException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.error("Error while getting uploaded bytes", e);
+            logger.error("", e);
         }
 
         try {
             this.tusFileUploadWrapperService.deleteUpload(uploadURI);
         } catch (IOException e) {
-            logger.error("Error while deleting uploaded data", e);
+            logger.error("", e);
         }
     }
 
@@ -55,7 +55,7 @@ public class StorageTempService {
         catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
                  NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
                  InternalException e) {
-            logger.error("Error while getting original bytes of data", e);
+            logger.error("", e);
             throw new RuntimeException(e);
         }
     }
