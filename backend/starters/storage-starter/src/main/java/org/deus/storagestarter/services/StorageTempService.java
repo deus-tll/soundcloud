@@ -1,18 +1,18 @@
 package org.deus.storagestarter.services;
 
-import io.minio.errors.*;
-import lombok.AllArgsConstructor;
-
 import org.deus.storagestarter.drivers.StorageDriverInterface;
+import org.deus.storagestarter.exceptions.StorageException;
+
+import org.springframework.stereotype.Service;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -34,17 +34,12 @@ public class StorageTempService {
             byte[] fileBytes = inputStream.readAllBytes();
 
             storage.put(tempBucketName, buildPath(userId, fileId), fileBytes);
-        }
-        catch (IOException | ServerException | InsufficientDataException | ErrorResponseException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
-            logger.error("", e);
-        }
 
-        try {
             this.tusFileUploadWrapperService.deleteUpload(uploadURI);
-        } catch (IOException e) {
+        }
+        catch (StorageException | IOException e) {
             logger.error("", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,9 +47,7 @@ public class StorageTempService {
         try {
             return storage.getBytes(tempBucketName, buildPath(userId, fileId));
         }
-        catch (ServerException | InsufficientDataException | ErrorResponseException | IOException |
-                 NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException |
-                 InternalException e) {
+        catch (StorageException e) {
             logger.error("", e);
             throw new RuntimeException(e);
         }
