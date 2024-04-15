@@ -6,40 +6,36 @@ import org.deus.src.enums.FileType;
 import org.deus.src.services.auth.UserService;
 
 import org.deus.src.services.storages.StorageTempService;
+import org.deus.src.services.upload.TusFileUploadWrapperService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import me.desair.tus.server.TusFileUploadService;
 import me.desair.tus.server.exception.TusException;
 import me.desair.tus.server.upload.UploadInfo;
 
 @RestController
 @RequestMapping("/api/upload")
 public class UploadController {
-    private final TusFileUploadService tusFileUploadService;
+    private final TusFileUploadWrapperService tusFileUploadWrapperService;
     private final StorageTempService storageTempService;
     private final UserService userService;
-    private final Path tusUploadDirectory;
     private final String[] REQUIRED_METADATA_KEYS = {"uploadingFileType", "fileId"};
 
-    public UploadController(TusFileUploadService tusFileUploadService, StorageTempService storageTempService, UserService userService, AppProperties appProperties) {
-        this.tusFileUploadService = tusFileUploadService;
+    public UploadController(TusFileUploadWrapperService tusFileUploadWrapperService, StorageTempService storageTempService, UserService userService) {
+        this.tusFileUploadWrapperService = tusFileUploadWrapperService;
         this.storageTempService = storageTempService;
         this.userService = userService;
-        this.tusUploadDirectory = Paths.get(appProperties.getTusUploadDirectory());
     }
 
     @RequestMapping(
@@ -50,21 +46,18 @@ public class UploadController {
                     RequestMethod.GET
             })
     public void upload(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
-        this.tusFileUploadService.process(servletRequest, servletResponse);
+
+        this.tusFileUploadWrapperService.processRequest(servletRequest, servletResponse);
 
         String uploadURI = servletRequest.getRequestURI();
 
-        UploadInfo uploadInfo = null;
+        Optional<UploadInfo> uploadInfoObject = this.tusFileUploadWrapperService.getUploadInfo(uploadURI);
 
-        try {
-            uploadInfo = this.tusFileUploadService.getUploadInfo(uploadURI);
-        } catch (IOException | TusException e) {
-            SrcApplication.logger.error("Get upload info", e);
-        }
-
-        if (uploadInfo == null) {
+        if (uploadInfoObject.isEmpty()) {
             return;
         }
+
+        UploadInfo uploadInfo = uploadInfoObject.get();
 
         Map<String, String> metadata = uploadInfo.getMetadata();
 
@@ -76,6 +69,8 @@ public class UploadController {
             CompletableFuture.runAsync(() -> {
                 try {
                     this.storageTempService.putContent(userService.getCurrentUser().getId(), userService.getCurrentUser().getUsername(), uploadURI, metadata);
+
+
                 } catch (Exception e) {
                     SrcApplication.logger.error("Error during file upload", e);
                 }
@@ -135,13 +130,6 @@ public class UploadController {
 
     @Scheduled(fixedDelayString = "PT24H")
     private void cleanup() {
-        Path locksDir = this.tusUploadDirectory.resolve("locks");
-        if (Files.exists(locksDir)) {
-            try {
-                this.tusFileUploadService.cleanup();
-            } catch (IOException e) {
-                SrcApplication.logger.error("Error during cleanup", e);
-            }
-        }
+        this.tusFileUploadWrapperService.cleanup();
     }
 }

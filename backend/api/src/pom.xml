@@ -17,9 +17,10 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+		
 		<dependency>
 			<groupId>org.deus</groupId>
-			<artifactId>soundcloud-spring-boot-starter</artifactId>
+			<artifactId>storage-starter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
