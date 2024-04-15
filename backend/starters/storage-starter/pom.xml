@@ -50,6 +50,13 @@
 			<artifactId>minio</artifactId>
 			<version>8.5.9</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.deus</groupId>
+			<artifactId>tus-upload-file-starter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
