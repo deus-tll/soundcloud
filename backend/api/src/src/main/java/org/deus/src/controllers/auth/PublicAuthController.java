@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication")
-public class AuthController {
+public class PublicAuthController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
 

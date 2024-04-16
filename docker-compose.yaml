@@ -1,11 +1,11 @@
 version: '3'
 services:
 
-  frontend.public:
+  soundcloud.frontend.public:
     build:
       dockerfile: Dockerfile
       context: ./frontend/public
-    container_name: frontend.public
+    container_name: soundcloud.frontend.public
     volumes:
       - ./frontend/public/src:/usr/src/app
     ports:
@@ -27,17 +27,17 @@ services:
       context: ./backend/api
     container_name: soundcloud.api
     depends_on:
-      - db.mysql.soundcloud.main
-      - storage.minio.soundcloud
+      - soundcloud.db.mysql.main
+      - soundcloud.storage.minio
     ports:
       - "8080:8080"
 
 
-  db.mysql.soundcloud.main:
+  soundcloud.db.mysql.main:
     build:
       dockerfile: Dockerfile
       context: ./services/mysql
-    container_name: db.mysql.soundcloud.main
+    container_name: soundcloud.db.mysql.main
     volumes:
       - ./volumes/db/mysql/soundcloud/main:/var/lib/mysql
     env_file:
@@ -47,11 +47,11 @@ services:
     networks:
       - sound_net
 
-  storage.minio.soundcloud:
+  soundcloud.storage.minio:
     build:
       dockerfile: Dockerfile
       context: ./services/minio
-    container_name: storage.minio.soundcloud
+    container_name: soundcloud.storage.minio
     volumes:
       - ./volumes/storage/minio/soundcloud:/var/lib/minio
     env_file:
@@ -62,7 +62,18 @@ services:
     networks:
       - sound_net
 
-  nginx.router:
+  soundcloud.rabbit.mq:
+    build:
+      dockerfile: Dockerfile
+      context: ./services/rabbitmq
+    container_name: soundcloud.rabbit.mq
+    env_file:
+      - .env
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  soundcloud.nginx.router:
     build:
       dockerfile: Dockerfile
       context: ./services/nginx
@@ -72,7 +83,7 @@ services:
       - '80:80'
     depends_on:
       - soundcloud.api
-      - db.mysql.soundcloud.main
+      - soundcloud.db.mysql.main
     networks:
       - sound_net
 

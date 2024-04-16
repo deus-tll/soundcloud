@@ -9,6 +9,7 @@ import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -59,5 +60,19 @@ public class AuthenticationService {
         var jwt = jwtService.generateToken(user);
 
         return new JwtAuthenticationResponse(jwt, new UserDTO(user));
+    }
+
+    public UserDetails validateToken(String token) throws StatusException {
+        String username = jwtService.extractUserName(token);
+        if (username == null) {
+            throw new StatusException("Invalid token", HttpStatus.UNAUTHORIZED);
+        }
+
+        UserDetails userDetails = userService.getByUsername(username);
+        if (userDetails == null) {
+            throw new StatusException("User not found", HttpStatus.UNAUTHORIZED);
+        }
+
+        return userDetails;
     }
 }
