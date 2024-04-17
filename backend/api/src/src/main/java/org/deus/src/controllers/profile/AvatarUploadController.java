@@ -3,8 +3,9 @@ package org.deus.src.controllers.profile;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.services.auth.UserService;
 import org.deus.src.services.media.ConvertAvatarMediaService;
-import org.deus.src.services.storages.StorageAvatarService;
 
+import org.deus.storagestarter.services.StorageAvatarService;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("api/profile/avatar")
 @RequiredArgsConstructor
+@ComponentScan(basePackageClasses = {StorageAvatarService.class})
 public class AvatarUploadController {
     private final StorageAvatarService avatarService;
     private final UserService userService;

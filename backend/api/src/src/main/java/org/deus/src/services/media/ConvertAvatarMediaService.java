@@ -1,7 +1,7 @@
 package org.deus.src.services.media;
 
-import org.deus.src.services.storages.StorageAvatarService;
-
+import org.deus.storagestarter.services.StorageAvatarService;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@ComponentScan(basePackageClasses = {StorageAvatarService.class})
 public class ConvertAvatarMediaService {
     private final StorageAvatarService storageAvatarService;
 

@@ -1,12 +1,12 @@
 package org.deus.src.controllers;
 
 import org.deus.src.SrcApplication;
-import org.deus.src.config.AppProperties;
-import org.deus.src.enums.FileType;
 import org.deus.src.services.auth.UserService;
 
-import org.deus.src.services.storages.StorageTempService;
-import org.deus.src.services.upload.TusFileUploadWrapperService;
+import org.deus.storagestarter.services.StorageTempService;
+import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
+
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,11 +21,11 @@ import java.util.concurrent.CompletableFuture;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import me.desair.tus.server.exception.TusException;
 import me.desair.tus.server.upload.UploadInfo;
 
 @RestController
 @RequestMapping("/api/upload")
+@ComponentScan(basePackageClasses = {TusFileUploadWrapperService.class, StorageTempService.class})
 public class UploadController {
     private final TusFileUploadWrapperService tusFileUploadWrapperService;
     private final StorageTempService storageTempService;
@@ -115,17 +115,6 @@ public class UploadController {
             }
         }
         return true;
-    }
-
-    private FileType determineFileType(String mimeType) {
-        if (mimeType != null) {
-            if (mimeType.startsWith("audio/")) {
-                return FileType.AUDIO;
-            } else if (mimeType.startsWith("video/")) {
-                return FileType.VIDEO;
-            }
-        }
-        return FileType.UNKNOWN;
     }
 
     @Scheduled(fixedDelayString = "PT24H")

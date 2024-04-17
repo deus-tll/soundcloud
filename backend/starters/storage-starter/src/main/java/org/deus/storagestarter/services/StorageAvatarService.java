@@ -1,31 +1,19 @@
-package org.deus.src.services.storages;
-
-import org.deus.src.storages.drivers.StorageDriverInterface;
-
-import org.springframework.stereotype.Service;
-
-import java.io.File;
+package org.deus.storagestarter.services;
 
 import lombok.AllArgsConstructor;
+import org.deus.storagestarter.drivers.StorageDriverInterface;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Component
 public class StorageAvatarService {
     private final StorageDriverInterface storage;
     private final String avatarBucketName = "avatars";
 
     private String buildPath(long user_id) {
         return "/" + user_id + "/originalBytes";
-    }
-
-    public void putOriginal(long user_id, File file) {
-        try {
-            storage.put(avatarBucketName, buildPath(user_id), file);
-        } catch (Exception e) {
-            System.out.println(" Error ");
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
     }
 
     public void putOriginal(long user_id, byte[] bytes) {

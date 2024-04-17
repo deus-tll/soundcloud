@@ -8,6 +8,7 @@ import me.desair.tus.server.upload.UploadInfo;
 import org.deus.tusuploadfilestarter.config.TusProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Service
+@Component
 public class TusFileUploadWrapperService {
     private final TusFileUploadService tusFileUploadService;
     private final Path tusUploadDirectory;
@@ -41,8 +43,16 @@ public class TusFileUploadWrapperService {
         return Optional.ofNullable(uploadInfo);
     }
 
-    public InputStream getUploadedBytes(String uploadURI) throws TusException, IOException {
-        return this.tusFileUploadService.getUploadedBytes(uploadURI);
+    public Optional<InputStream> getUploadedBytes(String uploadURI) {
+        InputStream inputStream = null;
+        try {
+            inputStream = this.tusFileUploadService.getUploadedBytes(uploadURI);
+        }
+        catch (IOException | TusException e) {
+            logger.error("Error while deleting uploaded data", e);
+        }
+
+        return Optional.ofNullable(inputStream);
     }
 
     public void deleteUpload(String uploadURI) {

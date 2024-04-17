@@ -1,0 +1,11 @@
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\services\StorageAvatarService.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\enums\StorageEnum.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\exceptions\StorageException.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\config\StorageServicesAutoConfiguration.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\config\properties\MinioStorageProperties.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\config\properties\S3StorageProperties.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\services\StorageTempService.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\config\StorageConfiguration.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\drivers\StorageDriverInterface.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\config\properties\BaseStorageProperties.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\storage-starter\src\main\java\org\deus\storagestarter\drivers\StorageMinioDriver.java

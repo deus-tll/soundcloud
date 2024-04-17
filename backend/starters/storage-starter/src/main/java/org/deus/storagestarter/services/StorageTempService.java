@@ -6,14 +6,17 @@ import org.deus.storagestarter.exceptions.StorageException;
 import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Component
 public class StorageTempService {
     private final StorageDriverInterface storage;
 
@@ -26,18 +29,26 @@ public class StorageTempService {
     }
 
     public void putContent(long userId, String username, String uploadURI, Map<String, String> metadata) {
-        try (InputStream inputStream = this.tusFileUploadWrapperService.getUploadedBytes(uploadURI)) {
-            String fileId = metadata.get("fileId");
-            byte[] fileBytes = inputStream.readAllBytes();
+        Optional<InputStream> optionalInputStream = this.tusFileUploadWrapperService.getUploadedBytes(uploadURI);
 
-            storage.put(tempBucketName, buildPath(userId, fileId), fileBytes);
+        optionalInputStream.ifPresentOrElse(inputStream -> {
+            try (InputStream is = inputStream) {
+                processInputStream(is, userId, metadata, uploadURI);
+            } catch (IOException e) {
+                logger.error("Error while processing uploaded bytes", e);
+            }
+        }, () -> {
+            logger.error("Uploaded bytes not found for URI: " + uploadURI);
+        });
+    }
 
-            this.tusFileUploadWrapperService.deleteUpload(uploadURI);
-        }
-        catch (StorageException | IOException e) {
-            logger.error("", e);
-            throw new RuntimeException(e);
-        }
+    private void processInputStream(InputStream inputStream, long userId, Map<String, String> metadata, String uploadURI) throws IOException {
+        String fileId = metadata.get("fileId");
+        byte[] fileBytes = inputStream.readAllBytes();
+
+        storage.put(tempBucketName, buildPath(userId, fileId), fileBytes);
+
+        this.tusFileUploadWrapperService.deleteUpload(uploadURI);
     }
 
     public byte[] getOriginalBytes(long userId, String fileId) {

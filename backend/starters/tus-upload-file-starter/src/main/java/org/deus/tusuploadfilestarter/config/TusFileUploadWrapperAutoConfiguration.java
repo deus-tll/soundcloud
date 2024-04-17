@@ -5,12 +5,14 @@ import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @EnableConfigurationProperties(TusProperties.class)
 @PropertySource(value = "classpath:custom.properties")
+@ComponentScan
 public class TusFileUploadWrapperAutoConfiguration {
     private final TusFileUploadService tusFileUploadService;
     private final TusProperties tusProperties;

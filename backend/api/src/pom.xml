@@ -130,6 +130,11 @@
 			<artifactId>storage-starter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.deus</groupId>
+			<artifactId>tus-upload-file-starter</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
