@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.deus.storagestarter.config.StorageConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.deus.storagestarter.config.StorageTempServiceAutoConfiguration

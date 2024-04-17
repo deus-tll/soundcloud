@@ -1,28 +1,20 @@
 package org.deus.storagestarter.drivers;
 
+import io.minio.GetObjectArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.errors.*;
+import io.minio.messages.Bucket;
 import org.deus.storagestarter.exceptions.StorageException;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-
-import io.minio.MinioClient;
-import io.minio.MakeBucketArgs;
-import io.minio.GetObjectArgs;
-import io.minio.PutObjectArgs;
-import io.minio.messages.Bucket;
-
-import io.minio.errors.ServerException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InvalidResponseException;
-import io.minio.errors.XmlParserException;
-import io.minio.errors.InternalException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StorageMinioDriver implements StorageDriverInterface{
     private final MinioClient minioClient;

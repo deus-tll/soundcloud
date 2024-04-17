@@ -32,6 +32,16 @@ services:
     ports:
       - "8080:8080"
 
+  soundcloud.websocket.messenger:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/websocket-messenger
+    container_name: soundcloud.websocket.messenger
+    depends_on:
+      - soundcloud.db.mysql.main
+      - soundcloud.storage.minio
+    ports:
+      - "8081:8081"
 
   soundcloud.db.mysql.main:
     build:

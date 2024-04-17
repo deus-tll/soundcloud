@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import me.desair.tus.server.TusFileUploadService;
 import me.desair.tus.server.exception.TusException;
 import me.desair.tus.server.upload.UploadInfo;
-import org.deus.tusuploadfilestarter.config.upload.TusProperties;
+import org.deus.tusuploadfilestarter.config.TusProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
