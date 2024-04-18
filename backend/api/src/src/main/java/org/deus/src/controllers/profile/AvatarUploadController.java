@@ -1,21 +1,23 @@
 package org.deus.src.controllers.profile;
 
+import org.deus.dataobjectslayer.dtos.websocket.PayloadDTO;
+import org.deus.dataobjectslayer.dtos.websocket.WebsocketMessageDTO;
+import org.deus.src.SrcApplication;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.services.auth.UserService;
 import org.deus.src.services.media.ConvertAvatarMediaService;
 
 import org.deus.storagestarter.services.StorageAvatarService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,7 +31,7 @@ public class AvatarUploadController {
     private final StorageAvatarService avatarService;
     private final UserService userService;
     private final ConvertAvatarMediaService convertAvatarMediaService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final RabbitTemplate rabbitTemplate;
     private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     @PostMapping("/upload")
@@ -45,12 +47,11 @@ public class AvatarUploadController {
                 try {
                     convertAvatarMediaService.convertAvatar(userService.getCurrentUser().getId());
 
-                    messagingTemplate.convertAndSendToUser(
-                            userService.getCurrentUser().getUsername(),
-                            "/topic/avatars-ready",
-                            "Your avatars are ready!"
-                    );
-                } catch (IOException e) {
+                    PayloadDTO payloadDTO = new PayloadDTO("Your avatars are ready!", null);
+                    WebsocketMessageDTO websocketMessageDTO = new WebsocketMessageDTO("/topic/avatars-ready", payloadDTO);
+
+                    rabbitTemplate.convertAndSend("websocket.message.sent", websocketMessageDTO.toJson());
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
                 System.out.println("The task is executed in a thread: " + Thread.currentThread().getName());
@@ -58,8 +59,9 @@ public class AvatarUploadController {
 
             return new ResponseEntity<>("File uploaded successfully: ", HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new StatusException("Failed to upload file!", HttpStatus.INTERNAL_SERVER_ERROR);
+            String message = "Failed to upload avatar file!";
+            SrcApplication.logger.error(message, e);
+            throw new StatusException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

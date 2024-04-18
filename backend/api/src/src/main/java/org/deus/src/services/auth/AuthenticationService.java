@@ -1,9 +1,9 @@
 package org.deus.src.services.auth;
 
-import org.deus.src.dtos.auth.UserDTO;
+import org.deus.dataobjectslayer.dtos.auth.UserDTO;
+import org.deus.dataobjectslayer.models.auth.RoleEnum;
+import org.deus.dataobjectslayer.models.auth.UserModel;
 import org.deus.src.exceptions.StatusException;
-import org.deus.src.models.auth.RoleEnum;
-import org.deus.src.models.auth.UserModel;
 import org.deus.src.requests.auth.SignInRequest;
 import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
@@ -11,7 +11,6 @@ import org.deus.src.responses.auth.JwtAuthenticationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -52,7 +51,6 @@ public class AuthenticationService {
             authenticationManager.authenticate(authenticationToken);
         } catch (AuthenticationException e) {
             throw new StatusException(e.getMessage(), HttpStatus.UNAUTHORIZED);
-//            throw new AuthenticationCredentialsNotFoundException("Invalid username or password");
         }
 
         UserModel user = userService.getByUsername(request.getUsername());

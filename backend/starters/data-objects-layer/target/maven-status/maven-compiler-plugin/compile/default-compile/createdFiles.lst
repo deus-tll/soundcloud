@@ -1,0 +1,12 @@
+org\deus\dataobjectslayer\dtos\websocket\PayloadDTO.class
+org\deus\dataobjectslayer\dtos\errors\ErrorResponseDTO.class
+org\deus\dataobjectslayer\models\BaseEntity.class
+org\deus\dataobjectslayer\dtos\song\SongDTO.class
+org\deus\dataobjectslayer\models\auth\RoleEnum.class
+org\deus\dataobjectslayer\JsonSerializer.class
+org\deus\dataobjectslayer\models\auth\UserModel.class
+org\deus\dataobjectslayer\models\PerformerModel.class
+org\deus\dataobjectslayer\models\SongModel.class
+org\deus\dataobjectslayer\dtos\websocket\WebsocketMessageDTO.class
+org\deus\dataobjectslayer\models\auth\UserModel$UserModelBuilder.class
+org\deus\dataobjectslayer\dtos\auth\UserDTO.class

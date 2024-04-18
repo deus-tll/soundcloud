@@ -1,13 +1,12 @@
 package org.deus.src.responses.auth;
 
-import org.deus.src.dtos.auth.UserDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.deus.dataobjectslayer.dtos.auth.UserDTO;
 
 @Data
 @Builder

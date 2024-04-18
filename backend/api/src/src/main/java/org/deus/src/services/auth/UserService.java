@@ -1,7 +1,7 @@
 package org.deus.src.services.auth;
 
+import org.deus.dataobjectslayer.models.auth.UserModel;
 import org.deus.src.exceptions.StatusException;
-import org.deus.src.models.auth.UserModel;
 import org.deus.src.repositories.UserRepository;
 
 import org.springframework.http.HttpStatus;

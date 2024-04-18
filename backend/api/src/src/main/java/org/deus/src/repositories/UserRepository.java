@@ -1,7 +1,6 @@
 package org.deus.src.repositories;
 
-import org.deus.src.models.auth.UserModel;
-
+import org.deus.dataobjectslayer.models.auth.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
