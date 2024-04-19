@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PayloadDTO extends JsonSerializer implements Serializable {
+public class PayloadDTO extends JsonSerializer{
     private String message;
     private Object data;
 }

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebsocketMessageDTO extends JsonSerializer implements Serializable {
+public class WebsocketMessageDTO extends JsonSerializer {
     private String destination;
     private PayloadDTO payload;
 }

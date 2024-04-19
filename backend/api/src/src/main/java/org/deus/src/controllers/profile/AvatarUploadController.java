@@ -1,14 +1,12 @@
 package org.deus.src.controllers.profile;
 
-import org.deus.dataobjectslayer.dtos.websocket.PayloadDTO;
-import org.deus.dataobjectslayer.dtos.websocket.WebsocketMessageDTO;
+import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.SrcApplication;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.services.auth.UserService;
 import org.deus.src.services.media.ConvertAvatarMediaService;
 
 import org.deus.storagestarter.services.StorageAvatarService;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +24,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("api/profile/avatar")
 @RequiredArgsConstructor
-@ComponentScan(basePackageClasses = {StorageAvatarService.class})
+@ComponentScan(basePackageClasses = {StorageAvatarService.class, RabbitMQService.class})
 public class AvatarUploadController {
     private final StorageAvatarService avatarService;
     private final UserService userService;
     private final ConvertAvatarMediaService convertAvatarMediaService;
-    private final RabbitTemplate rabbitTemplate;
+    private final RabbitMQService rabbitMQService;
     private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     @PostMapping("/upload")
@@ -47,10 +45,11 @@ public class AvatarUploadController {
                 try {
                     convertAvatarMediaService.convertAvatar(userService.getCurrentUser().getId());
 
-                    PayloadDTO payloadDTO = new PayloadDTO("Your avatars are ready!", null);
-                    WebsocketMessageDTO websocketMessageDTO = new WebsocketMessageDTO("/topic/avatars-ready", payloadDTO);
-
-                    rabbitTemplate.convertAndSend("websocket.message.sent", websocketMessageDTO.toJson());
+                    this.rabbitMQService.sendWebsocketMessage(
+                            "websocket.message.sent",
+                            "/topic/avatars-ready",
+                            "Your avatars are ready!",
+                            null);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

@@ -20,7 +20,7 @@ import java.util.Optional;
 public class StorageTempService {
     private final StorageDriverInterface storage;
 
-    private final TusFileUploadWrapperService tusFileUploadWrapperService ;
+    private final TusFileUploadWrapperService tusFileUploadWrapperService;
     private static final Logger logger = LoggerFactory.getLogger(StorageTempService.class);
     private final String tempBucketName = "temp_files";
 

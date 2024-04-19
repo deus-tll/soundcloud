@@ -4,10 +4,8 @@ import lombok.Data;
 import org.deus.dataobjectslayer.models.auth.RoleEnum;
 import org.deus.dataobjectslayer.models.auth.UserModel;
 
-import java.io.Serializable;
-
 @Data
-public class UserDTO implements Serializable {
+public class UserDTO {
     private final Long id;
     private final String username;
     private final String email;
