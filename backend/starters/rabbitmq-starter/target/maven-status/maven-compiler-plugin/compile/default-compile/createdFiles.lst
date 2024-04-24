@@ -1,3 +1,4 @@
+org\deus\rabbitmqstarter\config\ObjectMapperConfiguration.class
 org\deus\rabbitmqstarter\config\RabbitMQServiceAutoConfiguration.class
 org\deus\rabbitmqstarter\config\RabbitTemplateConfiguration.class
 org\deus\rabbitmqstarter\services\RabbitMQService.class

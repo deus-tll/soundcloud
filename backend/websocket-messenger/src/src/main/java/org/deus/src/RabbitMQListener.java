@@ -1,7 +1,7 @@
 package org.deus.src;
 
 import lombok.AllArgsConstructor;
-import org.deus.dataobjectslayer.dtos.websocket.WebsocketMessageDTO;
+import org.deus.datalayerstarter.dtos.websocket.WebsocketMessageDTO;
 import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +21,9 @@ public class RabbitMQListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final RabbitMQService rabbitMQService;
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQListener.class);
-    @RabbitListener(queues = "websocket.message.sent")
+    @RabbitListener(queues = "websocket.message.send")
     public void websocketMessageSent(Message message) {
-        Optional<WebsocketMessageDTO> optionalWebsocketMessageDTO = this.rabbitMQService.receiveWebsocketMessage(message);
+        Optional<WebsocketMessageDTO> optionalWebsocketMessageDTO = this.rabbitMQService.receiveWebsocketMessageDTO(message);
 
         optionalWebsocketMessageDTO.ifPresentOrElse(websocketMessageDTO -> {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();

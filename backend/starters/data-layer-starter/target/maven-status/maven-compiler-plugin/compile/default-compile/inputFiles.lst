@@ -1,0 +1,11 @@
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\auth\UserDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\models\auth\UserModel.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\models\SongModel.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\JsonSerializer.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\models\auth\RoleEnum.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\errors\ErrorResponseDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\websocket\WebsocketMessageDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\models\PerformerModel.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\song\SongDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\websocket\PayloadDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\models\BaseEntity.java

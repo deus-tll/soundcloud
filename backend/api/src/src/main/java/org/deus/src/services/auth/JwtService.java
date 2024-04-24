@@ -1,6 +1,6 @@
 package org.deus.src.services.auth;
 
-import org.deus.dataobjectslayer.models.auth.UserModel;
+import org.deus.datalayerstarter.models.auth.UserModel;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;

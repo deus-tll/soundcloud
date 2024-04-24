@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.deus.dataobjectslayer.dtos.auth.UserDTO;
+import org.deus.datalayerstarter.dtos.auth.UserDTO;
 
 @Data
 @Builder

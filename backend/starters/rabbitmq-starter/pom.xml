@@ -55,7 +55,7 @@
 
     <dependency>
       <groupId>org.deus</groupId>
-      <artifactId>data-objects-layer</artifactId>
+      <artifactId>data-layer-starter</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>

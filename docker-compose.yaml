@@ -38,7 +38,22 @@ services:
       context: ./backend/websocket-messenger
     container_name: soundcloud.websocket.messenger
     depends_on:
-      - soundcloud.db.mysql.main
+      - soundcloud.storage.minio
+
+  soundcloud.image.handler:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/image-handler
+    container_name: soundcloud.image.handler
+    depends_on:
+      - soundcloud.storage.minio
+
+  soundcloud.external.api.handler:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/external-api-handler
+    container_name: soundcloud.external.api.handler
+    depends_on:
       - soundcloud.storage.minio
 
   soundcloud.db.mysql.main:

@@ -1,11 +1,10 @@
 package org.deus.rabbitmqstarter.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.deus.dataobjectslayer.dtos.websocket.PayloadDTO;
-import org.deus.dataobjectslayer.dtos.websocket.WebsocketMessageDTO;
+import org.deus.datalayerstarter.dtos.auth.UserDTO;
+import org.deus.datalayerstarter.dtos.websocket.PayloadDTO;
+import org.deus.datalayerstarter.dtos.websocket.WebsocketMessageDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -18,9 +17,24 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RabbitMQService {
     private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQService.class);
 
-    public void sendWebsocketMessage(String queueName, String websocketDestination, String payloadMessage, Object payloadData) {
+    public <T> Optional<T> deserializeMessage(Message message, Class<T> targetClass) {
+        try {
+            String json = new String(message.getBody());
+            T object = objectMapper.readValue(json, targetClass);
+
+            return Optional.of(object);
+        }
+        catch (Exception e) {
+            logger.error("Error while trying to convert message back from json", e);
+
+            return Optional.empty();
+        }
+    }
+
+    public void sendWebsocketMessageDTO(String queueName, String websocketDestination, String payloadMessage, Object payloadData) {
         PayloadDTO payloadDTO = new PayloadDTO(payloadMessage, payloadData);
         WebsocketMessageDTO websocketMessageDTO = new WebsocketMessageDTO(websocketDestination, payloadDTO);
 
@@ -28,22 +42,40 @@ public class RabbitMQService {
             rabbitTemplate.convertAndSend(queueName, websocketMessageDTO.toJson());
         }
         catch (Exception e) {
-            logger.error("Error while sending message to \"Websocket-Messenger Microservice\" via RabbitMQ", e);
+            logger.error("Error while sending WebsocketMessageDTO via RabbitMQ to " + queueName, e);
         }
     }
 
-    public Optional<WebsocketMessageDTO> receiveWebsocketMessage(Message message) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = new String(message.getBody());
-        WebsocketMessageDTO websocketMessageDTO = null;
+    public Optional<WebsocketMessageDTO> receiveWebsocketMessageDTO(Message message) {
+        return deserializeMessage(message, WebsocketMessageDTO.class);
+    }
 
+    public void sendUserDTO(String queueName, UserDTO userDTO) {
         try {
-            websocketMessageDTO = objectMapper.readValue(json, WebsocketMessageDTO.class);
+            rabbitTemplate.convertAndSend(queueName, userDTO.toJson());
+        } catch (Exception e) {
+            logger.error("Error while sending UserDTO via RabbitMQ to " + queueName, e);
         }
-        catch (JsonProcessingException e) {
-            logger.error("Error while trying to convert message back from json", e);
-        }
+    }
 
-        return Optional.ofNullable(websocketMessageDTO);
+    public Optional<UserDTO> receiveUserDTO(Message message) {
+        return deserializeMessage(message, UserDTO.class);
+    }
+
+    public void sendUserId(String queueName, Long id) {
+        rabbitTemplate.convertAndSend(queueName, id);
+    }
+
+    public Optional<Long> receiveUserLongId(Message message) {
+        try {
+            String userIdString = new String(message.getBody());
+            Long userId = Long.parseLong(userIdString);
+
+            return Optional.of(userId);
+        } catch (NumberFormatException e) {
+            logger.error("Error while parsing userId(Long) from Message body", e);
+
+            return Optional.empty();
+        }
     }
 }

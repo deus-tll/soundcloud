@@ -1,13 +1,15 @@
 package org.deus.src.services.auth;
 
-import org.deus.dataobjectslayer.dtos.auth.UserDTO;
-import org.deus.dataobjectslayer.models.auth.RoleEnum;
-import org.deus.dataobjectslayer.models.auth.UserModel;
+import org.deus.datalayerstarter.dtos.auth.UserDTO;
+import org.deus.datalayerstarter.models.auth.RoleEnum;
+import org.deus.datalayerstarter.models.auth.UserModel;
+import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.requests.auth.SignInRequest;
 import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -20,9 +22,11 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@ComponentScan(basePackageClasses = {RabbitMQService.class})
 public class AuthenticationService {
     private final UserService userService;
     private final JwtService jwtService;
+    private final RabbitMQService rabbitMQService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
@@ -36,9 +40,13 @@ public class AuthenticationService {
 
         userService.create(user);
 
+        UserDTO userDTO = new UserDTO(user);
+
+        rabbitMQService.sendUserDTO("user.register", userDTO);
+
         String jwt = jwtService.generateToken(user);
 
-        return new JwtAuthenticationResponse(jwt, new UserDTO(user));
+        return new JwtAuthenticationResponse(jwt, userDTO);
     }
 
     public JwtAuthenticationResponse signIn(SignInRequest request) throws StatusException {

@@ -10,8 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan
-@ComponentScan(basePackages = "org.deus.tusuploadfilestarter.services")
+@ComponentScan(basePackageClasses = {TusFileUploadWrapperService.class})
 public class StorageServicesAutoConfiguration {
     private final StorageDriverInterface storage;
     private final TusFileUploadWrapperService tusFileUploadWrapperService;
