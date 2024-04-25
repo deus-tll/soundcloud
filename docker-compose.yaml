@@ -1,60 +1,60 @@
 version: '3'
 services:
 
-  soundcloud.frontend.public:
-    build:
-      dockerfile: Dockerfile
-      context: ./frontend/public
-    container_name: soundcloud.frontend.public
-    volumes:
-      - ./frontend/public/src:/usr/src/app
-    ports:
-      - '3000:3000'
-    environment:
-      - WDS_SOCKET_HOST=127.0.0.1
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
-    env_file:
-      - .env
-    depends_on:
-      - soundcloud.api
-    networks:
-      - sound_net
-
-  soundcloud.api:
-    build:
-      dockerfile: Dockerfile
-      context: ./backend/api
-    container_name: soundcloud.api
-    depends_on:
-      - soundcloud.db.mysql.main
-      - soundcloud.storage.minio
-    ports:
-      - "8080:8080"
-
-  soundcloud.websocket.messenger:
-    build:
-      dockerfile: Dockerfile
-      context: ./backend/websocket-messenger
-    container_name: soundcloud.websocket.messenger
-    depends_on:
-      - soundcloud.storage.minio
-
-  soundcloud.image.handler:
-    build:
-      dockerfile: Dockerfile
-      context: ./backend/image-handler
-    container_name: soundcloud.image.handler
-    depends_on:
-      - soundcloud.storage.minio
-
-  soundcloud.external.api.handler:
-    build:
-      dockerfile: Dockerfile
-      context: ./backend/external-api-handler
-    container_name: soundcloud.external.api.handler
-    depends_on:
-      - soundcloud.storage.minio
+#  soundcloud.frontend.public:
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./frontend/public
+#    container_name: soundcloud.frontend.public
+#    volumes:
+#      - ./frontend/public/src:/usr/src/app
+#    ports:
+#      - '3000:3000'
+#    environment:
+#      - WDS_SOCKET_HOST=127.0.0.1
+#      - CHOKIDAR_USEPOLLING=true
+#      - WATCHPACK_POLLING=true
+#    env_file:
+#      - .env
+#    depends_on:
+#      - soundcloud.api
+#    networks:
+#      - sound_net
+#
+#  soundcloud.api:
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./backend/api
+#    container_name: soundcloud.api
+#    depends_on:
+#      - soundcloud.db.mysql.main
+#      - soundcloud.storage.minio
+#    ports:
+#      - "8080:8080"
+#
+#  soundcloud.websocket.messenger:
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./backend/websocket-messenger
+#    container_name: soundcloud.websocket.messenger
+#    depends_on:
+#      - soundcloud.storage.minio
+#
+#  soundcloud.image.handler:
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./backend/image-handler
+#    container_name: soundcloud.image.handler
+#    depends_on:
+#      - soundcloud.storage.minio
+#
+#  soundcloud.external.api.handler:
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./backend/external-api-handler
+#    container_name: soundcloud.external.api.handler
+#    depends_on:
+#      - soundcloud.storage.minio
 
   soundcloud.db.mysql.main:
     build:
@@ -96,19 +96,19 @@ services:
       - "5672:5672"
       - "15672:15672"
 
-  soundcloud.nginx.router:
-    build:
-      dockerfile: Dockerfile
-      context: ./services/nginx
-    volumes:
-      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    ports:
-      - '80:80'
-    depends_on:
-      - soundcloud.api
-      - soundcloud.db.mysql.main
-    networks:
-      - sound_net
+#  soundcloud.nginx.router:
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./services/nginx
+#    volumes:
+#      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#    ports:
+#      - '80:80'
+#    depends_on:
+#      - soundcloud.api
+#      - soundcloud.db.mysql.main
+#    networks:
+#      - sound_net
 
 networks:
   sound_net:

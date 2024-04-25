@@ -5,6 +5,7 @@ import org.deus.src.SrcApplication;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.services.auth.UserService;
 
+import org.deus.storagestarter.drivers.StorageDriverInterface;
 import org.deus.storagestarter.services.StorageAvatarService;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -37,11 +38,13 @@ public class AvatarUploadController {
 
             rabbitMQService.sendUserId("convert.avatar", userService.getCurrentUser().getId());
 
+            ////////// перенести в мікросервіс
             this.rabbitMQService.sendWebsocketMessageDTO(
                     "websocket.message.sent",
                     "/topic/avatars-ready",
                     "Your avatars are ready!",
                     null);
+            //////////
 
             return new ResponseEntity<>("File uploaded successfully: ", HttpStatus.OK);
         } catch (Exception e) {

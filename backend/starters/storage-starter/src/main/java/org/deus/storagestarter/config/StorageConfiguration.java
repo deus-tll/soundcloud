@@ -27,7 +27,7 @@ public class StorageConfiguration {
     }
 
     @Bean
-    public StorageDriverInterface StorageService() {
+    public StorageDriverInterface storageService() {
         StorageEnum currentMainStorage = StorageEnum.MINIO;
         StorageDriverInterface storageClient = null;
 

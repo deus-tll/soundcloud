@@ -19,11 +19,12 @@ import java.util.Optional;
 public class StorageAvatarService {
     private final StorageDriverInterface storage;
     private final String avatarBucketName = "avatars";
+    private static final Logger logger = LoggerFactory.getLogger(StorageAvatarService.class);
+
 
     private String buildPathToOriginalBytes(long userId) {
         return "/" + userId + "/originalBytes";
     }
-    private static final Logger logger = LoggerFactory.getLogger(StorageAvatarService.class);
 
     public void putOriginalBytes(long userId, byte[] bytes) {
         try {
