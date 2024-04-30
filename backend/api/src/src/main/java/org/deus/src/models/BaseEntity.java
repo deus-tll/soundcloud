@@ -1,4 +1,4 @@
-package org.deus.datalayerstarter.models;
+package org.deus.src.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;

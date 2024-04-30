@@ -1,10 +1,10 @@
 package org.deus.src.services.auth;
 
 import org.deus.datalayerstarter.dtos.auth.UserDTO;
-import org.deus.datalayerstarter.models.auth.RoleEnum;
-import org.deus.datalayerstarter.models.auth.UserModel;
+import org.deus.datalayerstarter.enums.auth.RoleEnum;
 import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.exceptions.StatusException;
+import org.deus.src.models.auth.UserModel;
 import org.deus.src.requests.auth.SignInRequest;
 import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
@@ -40,7 +40,7 @@ public class AuthenticationService {
 
         userService.create(user);
 
-        UserDTO userDTO = new UserDTO(user);
+        UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
 
         rabbitMQService.sendUserDTO("user.register", userDTO);
 
@@ -65,7 +65,9 @@ public class AuthenticationService {
 
         var jwt = jwtService.generateToken(user);
 
-        return new JwtAuthenticationResponse(jwt, new UserDTO(user));
+        UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+
+        return new JwtAuthenticationResponse(jwt, userDTO);
     }
 
     public UserDetails validateToken(String token) throws StatusException {

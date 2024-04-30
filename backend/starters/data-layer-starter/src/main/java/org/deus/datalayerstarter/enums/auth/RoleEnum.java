@@ -1,4 +1,4 @@
-package org.deus.datalayerstarter.models.auth;
+package org.deus.datalayerstarter.enums.auth;
 
 public enum RoleEnum {
     ROLE_USER,

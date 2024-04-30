@@ -1,10 +1,10 @@
-package org.deus.datalayerstarter.models;
+package org.deus.src.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.deus.datalayerstarter.models.auth.UserModel;
+import org.deus.src.models.auth.UserModel;
 
 import java.util.Set;
 

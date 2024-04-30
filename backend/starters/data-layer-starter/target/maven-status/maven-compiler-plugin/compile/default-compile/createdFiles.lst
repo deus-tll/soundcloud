@@ -1,12 +1,7 @@
-org\deus\datalayerstarter\models\auth\RoleEnum.class
 org\deus\datalayerstarter\dtos\websocket\WebsocketMessageDTO.class
-org\deus\datalayerstarter\models\PerformerModel.class
-org\deus\datalayerstarter\models\SongModel.class
 org\deus\datalayerstarter\dtos\errors\ErrorResponseDTO.class
 org\deus\datalayerstarter\dtos\auth\UserDTO.class
-org\deus\datalayerstarter\models\auth\UserModel$UserModelBuilder.class
+org\deus\datalayerstarter\enums\auth\RoleEnum.class
 org\deus\datalayerstarter\dtos\song\SongDTO.class
 org\deus\datalayerstarter\JsonSerializer.class
 org\deus\datalayerstarter\dtos\websocket\PayloadDTO.class
-org\deus\datalayerstarter\models\auth\UserModel.class
-org\deus\datalayerstarter\models\BaseEntity.class

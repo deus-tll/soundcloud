@@ -1,4 +1,4 @@
-package org.deus.datalayerstarter.models.auth;
+package org.deus.src.models.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
@@ -8,9 +8,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.deus.datalayerstarter.models.BaseEntity;
-import org.deus.datalayerstarter.models.PerformerModel;
-import org.deus.datalayerstarter.models.SongModel;
+import org.deus.datalayerstarter.enums.auth.RoleEnum;
+import org.deus.src.models.BaseEntity;
+import org.deus.src.models.PerformerModel;
+import org.deus.src.models.SongModel;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

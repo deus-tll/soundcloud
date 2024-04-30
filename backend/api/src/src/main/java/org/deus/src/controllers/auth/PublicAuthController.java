@@ -2,6 +2,7 @@ package org.deus.src.controllers.auth;
 
 import org.deus.datalayerstarter.dtos.auth.UserDTO;
 import org.deus.src.exceptions.StatusException;
+import org.deus.src.models.auth.UserModel;
 import org.deus.src.requests.auth.SignInRequest;
 import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
@@ -41,6 +42,8 @@ public class PublicAuthController {
     @Operation(summary = "Getting the current user (by key)")
     @GetMapping("/me")
     public ResponseEntity<UserDTO> me(){
-        return ResponseEntity.ok(new UserDTO(userService.getCurrentUser()));
+        UserModel user = userService.getCurrentUser();
+        UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        return ResponseEntity.ok(userDTO);
     }
 }
