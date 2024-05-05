@@ -1,5 +1,7 @@
 package org.deus.src.controllers.profile;
 
+import org.deus.datalayerstarter.exceptions.data.DataSavingException;
+import org.deus.datalayerstarter.exceptions.message.MessageSendingException;
 import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.SrcApplication;
 import org.deus.src.exceptions.StatusException;
@@ -7,6 +9,8 @@ import org.deus.src.services.auth.UserService;
 
 import org.deus.storagestarter.drivers.StorageDriverInterface;
 import org.deus.storagestarter.services.StorageAvatarService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("api/profile/avatar")
 @RequiredArgsConstructor
@@ -26,6 +32,7 @@ public class AvatarUploadController {
     private final StorageAvatarService avatarService;
     private final UserService userService;
     private final RabbitMQService rabbitMQService;
+    private static final Logger logger = LoggerFactory.getLogger(AvatarUploadController.class);
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadAvatar(@RequestParam("avatar") MultipartFile avatar) throws StatusException {
@@ -38,18 +45,11 @@ public class AvatarUploadController {
 
             rabbitMQService.sendUserId("convert.avatar", userService.getCurrentUser().getId());
 
-            ////////// перенести в мікросервіс
-            this.rabbitMQService.sendWebsocketMessageDTO(
-                    "websocket.message.send",
-                    "/topic/avatars-ready",
-                    "Your avatars are ready!",
-                    null);
-            //////////
-
-            return new ResponseEntity<>("File uploaded successfully: ", HttpStatus.OK);
-        } catch (Exception e) {
+            return new ResponseEntity<>("Process of updating avatar has started. Please wait...", HttpStatus.OK);
+        }
+        catch (IOException | DataSavingException | MessageSendingException e) {
             String message = "Failed to upload avatar file!";
-            SrcApplication.logger.error(message, e);
+            logger.error(message, e);
             throw new StatusException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

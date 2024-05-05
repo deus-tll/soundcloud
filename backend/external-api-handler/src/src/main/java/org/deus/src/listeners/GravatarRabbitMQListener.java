@@ -2,6 +2,9 @@ package org.deus.src.listeners;
 
 import lombok.AllArgsConstructor;
 import org.deus.datalayerstarter.dtos.auth.UserDTO;
+import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
+import org.deus.datalayerstarter.exceptions.data.DataSavingException;
+import org.deus.datalayerstarter.exceptions.message.MessageSendingException;
 import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.services.GravatarService;
 import org.deus.storagestarter.services.StorageAvatarService;
@@ -34,18 +37,35 @@ public class GravatarRabbitMQListener {
     public void userRegister(Message message) {
         Optional<UserDTO> optionalUserDTO = this.rabbitMQService.receiveUserDTO(message);
 
-        optionalUserDTO.ifPresentOrElse(userDTO -> {
-            try {
-                String gravatarUrl = this.gravatarService.getGravatarUrl(userDTO.getEmail());
-                this.storageAvatarService.gravatarDownloadAndPut(userDTO.getId(), gravatarUrl);
-
-                this.rabbitMQService.sendUserId("convert.avatar", userDTO.getId());
-            }
-            catch (RuntimeException e) {
-                logger.error("Error while getting gravatar's result", e);
-            }
-        }, () -> {
+        if (optionalUserDTO.isEmpty()) {
             logger.error(UserDTO.class.getName() + " was not present when trying to get gravatar's result");
-        });
+            this.sendErrorMessage();
+            return;
+        }
+
+        UserDTO userDTO = optionalUserDTO.get();
+
+        try {
+            String gravatarUrl = this.gravatarService.getGravatarUrl(userDTO.getEmail());
+            this.storageAvatarService.gravatarDownloadAndPut(userDTO.getId(), gravatarUrl);
+            this.rabbitMQService.sendUserId("convert.avatar", userDTO.getId());
+        }
+        catch (DataProcessingException | DataSavingException e) {
+            logger.error("Error while getting gravatar's result", e);
+            this.sendErrorMessage();
+        }
+        catch (MessageSendingException e) {
+            logger.error("Error while trying to send gravatar's result to microservice for converting", e);
+            this.sendErrorMessage();
+        }
+    }
+
+    private void sendErrorMessage() {
+        String errorMessage = "Something went wrong while trying to get user's avatar with service gravatar. We'll try later";
+        this.rabbitMQService.sendWebsocketMessageDTO(
+                "websocket.message.send",
+                "/topic/error",
+                errorMessage,
+                null);
     }
 }

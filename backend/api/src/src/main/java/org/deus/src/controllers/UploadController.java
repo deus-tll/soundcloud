@@ -1,11 +1,17 @@
 package org.deus.src.controllers;
 
+import lombok.AllArgsConstructor;
+import org.deus.datalayerstarter.exceptions.data.DataNotFoundException;
+import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
+import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.SrcApplication;
 import org.deus.src.services.auth.UserService;
 
 import org.deus.storagestarter.services.StorageTempService;
 import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,19 +30,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import me.desair.tus.server.upload.UploadInfo;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/upload")
 @ComponentScan(basePackageClasses = {TusFileUploadWrapperService.class, StorageTempService.class})
 public class UploadController {
     private final TusFileUploadWrapperService tusFileUploadWrapperService;
     private final StorageTempService storageTempService;
     private final UserService userService;
-    private final String[] REQUIRED_METADATA_KEYS = {"uploadingFileType", "fileId"};
-
-    public UploadController(TusFileUploadWrapperService tusFileUploadWrapperService, StorageTempService storageTempService, UserService userService) {
-        this.tusFileUploadWrapperService = tusFileUploadWrapperService;
-        this.storageTempService = storageTempService;
-        this.userService = userService;
-    }
+    private final RabbitMQService rabbitMQService;
+    private final String[] REQUIRED_METADATA_KEYS = {"fileId"};
+    private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
     @RequestMapping(
             value = "/file",
@@ -54,6 +57,7 @@ public class UploadController {
         Optional<UploadInfo> uploadInfoObject = this.tusFileUploadWrapperService.getUploadInfo(uploadURI);
 
         if (uploadInfoObject.isEmpty()) {
+            logger.error("Couldn't get UploadInfo due to some problems");
             return;
         }
 
@@ -62,18 +66,25 @@ public class UploadController {
         Map<String, String> metadata = uploadInfo.getMetadata();
 
         if (!checkMetadata(metadata, servletResponse, REQUIRED_METADATA_KEYS)) {
+            logger.error("User didn't provide necessary metadata");
             return;
         }
 
         if (!uploadInfo.isUploadInProgress()) {
             CompletableFuture.runAsync(() -> {
+                Long userId = userService.getCurrentUser().getId();
+
                 try {
-                    this.storageTempService.putContent(userService.getCurrentUser().getId(), uploadURI, metadata);
-                    //userService.getCurrentUser().getUsername();
+                    this.storageTempService.putContent(userId, uploadURI, metadata);
 
-
-                } catch (Exception e) {
-                    SrcApplication.logger.error("Error during file upload", e);
+                    this.rabbitMQService.sendWebsocketMessageDTO(
+                            "websocket.message.send",
+                            "/topic/file.upload.ready." + metadata.get("fileId"),
+                            "Your avatar is ready!",
+                            null);
+                }
+                catch (DataNotFoundException | DataProcessingException e) {
+                    logger.error("Error during storing file upload with URI \"" + uploadURI + "\", for user with id \"" + userId + "\" and metadata: [" + metadata.toString() + "]", e);
                 }
             });
         }
@@ -92,7 +103,7 @@ public class UploadController {
         try {
             isFileExists = this.storageTempService.isFileExists(userService.getCurrentUser().getId(), fileId);
         } catch (Exception e) {
-            SrcApplication.logger.error("", e);
+            logger.error("User was trying to check if file exists in storage and error occurred");
         }
 
         return new ResponseEntity<>(isFileExists, HttpStatus.OK);

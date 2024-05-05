@@ -1,5 +1,6 @@
 package org.deus.src.services;
 
+import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
@@ -9,13 +10,13 @@ import java.security.NoSuchAlgorithmException;
 public class GravatarService {
     private static final String GRAVATAR_URL = "https://www.gravatar.com/avatar/";
 
-    public String getGravatarUrl(String email) throws RuntimeException {
+    public String getGravatarUrl(String email) throws DataProcessingException {
         String hash;
 
         try {
             hash = this.getMd5Hash(email.trim().toLowerCase());
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new DataProcessingException(e);
         }
 
         String ext = ".jpg";

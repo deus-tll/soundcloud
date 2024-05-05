@@ -1,10 +1,8 @@
 package org.deus.src.listeners;
 
 import lombok.AllArgsConstructor;
-import org.deus.datalayerstarter.dtos.auth.UserDTO;
 import org.deus.datalayerstarter.exceptions.data.DataIsNotPresentException;
 import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
-import org.deus.datalayerstarter.exceptions.message.MessageSendingException;
 import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.services.ConvertAvatarService;
 import org.slf4j.Logger;
@@ -29,14 +27,8 @@ public class ConvertAvatarRabbitMQListener {
         Optional<Long> optionalUserId = this.rabbitMQService.receiveUserLongId(message);
 
         if (optionalUserId.isEmpty()) {
-            String errorMessage = "UserId was not present when trying to convert avatar";
-            logger.error(errorMessage);
-            this.rabbitMQService.sendWebsocketMessageDTO(
-                    "websocket.message.send",
-                    "/topic/avatar-error",
-                    errorMessage,
-                    null);
-
+            logger.error("UserId was not present when trying to convert avatar");
+            this.sendErrorMessage();
             return;
         }
 
@@ -44,22 +36,24 @@ public class ConvertAvatarRabbitMQListener {
 
         try {
             this.convertAvatarService.convertAvatar(userId);
-
             this.rabbitMQService.sendWebsocketMessageDTO(
                     "websocket.message.send",
-                    "/topic/avatar-ready",
+                    "/topic/avatar.ready",
                     "Your avatar is ready!",
                     null);
         }
         catch (DataIsNotPresentException | DataProcessingException e) {
-            String errorMessage = "Some problems have occurred while trying to convert avatar";
-            logger.error(errorMessage + " for user with id \"" + userId + "\"", e);
-
-            this.rabbitMQService.sendWebsocketMessageDTO(
-                    "websocket.message.send",
-                    "/topic/avatar-error",
-                    errorMessage,
-                    null);
+            logger.error("Some problems have occurred while trying to convert avatar for user with id \"" + userId + "\"", e);
+            this.sendErrorMessage();
         }
+    }
+
+    private void sendErrorMessage() {
+        String errorMessage = "Something went wrong while trying to prepare user's avatar. Please try later";
+        this.rabbitMQService.sendWebsocketMessageDTO(
+                "websocket.message.send",
+                "/topic/error",
+                errorMessage,
+                null);
     }
 }
