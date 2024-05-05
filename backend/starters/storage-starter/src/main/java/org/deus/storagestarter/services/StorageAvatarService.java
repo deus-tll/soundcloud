@@ -1,7 +1,9 @@
 package org.deus.storagestarter.services;
 
 import lombok.AllArgsConstructor;
+import org.deus.datalayerstarter.exceptions.data.DataSavingException;
 import org.deus.storagestarter.drivers.StorageDriverInterface;
+import org.deus.storagestarter.exceptions.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,7 @@ import java.util.Optional;
 @Component
 public class StorageAvatarService {
     private final StorageDriverInterface storage;
-    private final String avatarBucketName = "avatars";
+    private final String bucketName = "avatars";
     private static final Logger logger = LoggerFactory.getLogger(StorageAvatarService.class);
 
 
@@ -26,40 +28,60 @@ public class StorageAvatarService {
         return "/" + userId + "/originalBytes";
     }
 
-    public void putOriginalBytes(long userId, byte[] bytes) {
+    public void putOriginalBytes(long userId, byte[] bytes) throws DataSavingException {
         try {
-            storage.put(avatarBucketName, buildPathToOriginalBytes(userId), bytes);
-        } catch (Exception e) {
-            logger.error("Error while putting original bytes to store, bucket/container: \"" + avatarBucketName + "\"", e);
+            storage.put(bucketName, buildPathToOriginalBytes(userId), bytes);
+        }
+        catch (StorageException e) {
+            String errorMessage = "Error while putting original bytes to store, bucket/container: \"" + bucketName + "\"";
+            logger.error(errorMessage, e);
+            throw new DataSavingException(errorMessage, e);
         }
     }
 
-    public void putWebP(long userId, byte[] bytes) {
+    public void putWebP(long userId, byte[] bytes) throws DataSavingException {
         try {
-            storage.put(avatarBucketName,  "/" + userId + "/avatar.webp", bytes);
-        } catch (Exception e) {
-            logger.error("Error while putting WebP bytes to store, bucket/container: \"" + avatarBucketName + "\"", e);
+            storage.put(bucketName,  "/" + userId + "/avatar.webp", bytes);
+        }
+        catch (StorageException e) {
+            String errorMessage = "Error while putting WebP bytes to store, bucket/container: \"" + bucketName + "\"";
+            logger.error(errorMessage, e);
+            throw new DataSavingException(errorMessage, e);
         }
     }
 
     public Optional<byte[]> getOriginalBytes(long userId) {
         try {
-            byte[] bytes = storage.getBytes(avatarBucketName, buildPathToOriginalBytes(userId));
+            byte[] bytes = storage.getBytes(bucketName, buildPathToOriginalBytes(userId));
             return Optional.ofNullable(bytes);
-        } catch (Exception e) {
-            logger.error("Error while getting original bytes from store, bucket/container: \"" + avatarBucketName + "\"", e);
+        }
+        catch (StorageException e) {
+            logger.error("Error while getting original bytes from store, bucket/container: \"" + bucketName + "\"", e);
             return Optional.empty();
         }
     }
 
-    public void gravatarDownloadAndPut(long userId, String gravatarUrl) {
+    public void gravatarDownloadAndPut(long userId, String gravatarUrl) throws DataSavingException {
         try {
-            URL url = URI.create(gravatarUrl).toURL();
-            try (InputStream inputStream = url.openStream()) {
-                this.putOriginalBytes(userId, inputStream.readAllBytes());
-            }
-        } catch (IOException e) {
-            logger.error("Error while putting gravatar's original bytes to store, bucket/container: \"" + avatarBucketName + "\"", e);
+            byte[] imageData = downloadImage(gravatarUrl);
+            this.putOriginalBytes(userId, imageData);
+        }
+        catch (IOException e) {
+            String errorMessage = "Error while downloading image by url";
+            logger.error(errorMessage, e);
+            throw new DataSavingException(errorMessage, e);
+        }
+        catch (DataSavingException e) {
+            String errorMessage = "Error while putting gravatar's original bytes to store, bucket/container: \"" + bucketName + "\"";
+            logger.error(errorMessage, e);
+            throw new DataSavingException(errorMessage, e);
+        }
+    }
+
+    private byte[] downloadImage(String imageUrl) throws IOException {
+        URL url = URI.create(imageUrl).toURL();
+        try (InputStream inputStream = url.openStream()) {
+            return inputStream.readAllBytes();
         }
     }
 }

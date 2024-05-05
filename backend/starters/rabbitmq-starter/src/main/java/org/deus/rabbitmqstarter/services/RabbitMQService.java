@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import org.deus.datalayerstarter.dtos.auth.UserDTO;
 import org.deus.datalayerstarter.dtos.websocket.PayloadDTO;
 import org.deus.datalayerstarter.dtos.websocket.WebsocketMessageDTO;
+import org.deus.datalayerstarter.exceptions.message.MessageSendingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
@@ -42,7 +44,7 @@ public class RabbitMQService {
             rabbitTemplate.convertAndSend(queueName, websocketMessageDTO.toJson());
         }
         catch (Exception e) {
-            logger.error("Error while sending WebsocketMessageDTO via RabbitMQ to " + queueName, e);
+            logger.error("Error while sending WebsocketMessageDTO via RabbitMQ to queue \"" + queueName + "\"", e);
         }
     }
 
@@ -50,11 +52,14 @@ public class RabbitMQService {
         return deserializeMessage(message, WebsocketMessageDTO.class);
     }
 
-    public void sendUserDTO(String queueName, UserDTO userDTO) {
+    public void sendUserDTO(String queueName, UserDTO userDTO) throws MessageSendingException {
         try {
             rabbitTemplate.convertAndSend(queueName, userDTO.toJson());
-        } catch (Exception e) {
-            logger.error("Error while sending UserDTO via RabbitMQ to " + queueName, e);
+        }
+        catch (Exception e) {
+            String errorMessage = "Error while sending UserDTO via RabbitMQ to queue \"" + queueName + "\"";
+            logger.error(errorMessage, e);
+            throw new MessageSendingException(errorMessage, e);
         }
     }
 
@@ -62,8 +67,15 @@ public class RabbitMQService {
         return deserializeMessage(message, UserDTO.class);
     }
 
-    public void sendUserId(String queueName, Long id) {
-        rabbitTemplate.convertAndSend(queueName, id);
+    public void sendUserId(String queueName, Long id) throws MessageSendingException {
+        try {
+            rabbitTemplate.convertAndSend(queueName, id);
+        }
+        catch (AmqpException e) {
+            String errorMessage = "Error while sending UserId(Long) via RabbitMQ to queue \"" + queueName + "\"";
+            logger.error(errorMessage, e);
+            throw new MessageSendingException(errorMessage, e);
+        }
     }
 
     public Optional<Long> receiveUserLongId(Message message) {
@@ -73,7 +85,7 @@ public class RabbitMQService {
 
             return Optional.of(userId);
         } catch (NumberFormatException e) {
-            logger.error("Error while parsing userId(Long) from Message body", e);
+            logger.error("Error while parsing UserId(Long) from Message body", e);
 
             return Optional.empty();
         }

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import me.desair.tus.server.TusFileUploadService;
 import me.desair.tus.server.exception.TusException;
 import me.desair.tus.server.upload.UploadInfo;
-import org.deus.tusuploadfilestarter.config.TusProperties;
+import org.deus.datalayerstarter.exceptions.data.DataDeletingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,9 +24,9 @@ public class TusFileUploadWrapperService {
     private final Path tusUploadDirectory;
     private static final Logger logger = LoggerFactory.getLogger(TusFileUploadWrapperService.class);
 
-    public TusFileUploadWrapperService(TusFileUploadService tusFileUploadService, TusProperties tusProperties) {
+    public TusFileUploadWrapperService(TusFileUploadService tusFileUploadService, String uploadDirectory) {
         this.tusFileUploadService = tusFileUploadService;
-        this.tusUploadDirectory = Path.of(tusProperties.getUploadDirectory());
+        this.tusUploadDirectory = Path.of(uploadDirectory);
     }
 
     public void processRequest(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
@@ -34,36 +34,37 @@ public class TusFileUploadWrapperService {
     }
 
     public Optional<UploadInfo> getUploadInfo(String uploadURI) {
-        UploadInfo uploadInfo = null;
         try {
-            uploadInfo = this.tusFileUploadService.getUploadInfo(uploadURI);
+            UploadInfo uploadInfo = this.tusFileUploadService.getUploadInfo(uploadURI);
+            return Optional.ofNullable(uploadInfo);
         } catch (IOException | TusException e) {
             logger.error("Error while getting UploadInfo", e);
+            return Optional.empty();
         }
-        return Optional.ofNullable(uploadInfo);
     }
 
     public Optional<InputStream> getUploadedBytes(String uploadURI) {
-        InputStream inputStream = null;
         try {
-            inputStream = this.tusFileUploadService.getUploadedBytes(uploadURI);
+            InputStream inputStream = this.tusFileUploadService.getUploadedBytes(uploadURI);
+            return Optional.ofNullable(inputStream);
         }
         catch (IOException | TusException e) {
-            logger.error("Error while deleting uploaded data", e);
+            logger.error("Error while getting uploaded bytes from temporary directory of tus uploads. UploadURI: " + uploadURI, e);
+            return Optional.empty();
         }
-
-        return Optional.ofNullable(inputStream);
     }
 
-    public void deleteUpload(String uploadURI) {
+    public void deleteUpload(String uploadURI) throws DataDeletingException {
         try {
             this.tusFileUploadService.deleteUpload(uploadURI);
         } catch (IOException | TusException e) {
-            logger.error("Error while deleting uploaded data", e);
+            String errorMessage = "Error while deleting uploaded bytes from temporary directory of tus uploads. UploadURI: " + uploadURI;
+            logger.error(errorMessage, e);
+            throw new DataDeletingException(e);
         }
     }
 
-    public void cleanup() {
+    public void cleanup(){
         Path locksDir = this.tusUploadDirectory.resolve("locks");
         if (Files.exists(locksDir)) {
             try {

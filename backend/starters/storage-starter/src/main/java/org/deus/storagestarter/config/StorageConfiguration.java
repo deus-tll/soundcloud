@@ -7,12 +7,12 @@ import org.deus.storagestarter.drivers.StorageDriverInterface;
 import org.deus.storagestarter.drivers.StorageMinioDriver;
 import org.deus.storagestarter.enums.StorageEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties({MinioStorageProperties.class, S3StorageProperties.class})
 @PropertySource(value = "classpath:custom.properties")
 public class StorageConfiguration {
@@ -27,7 +27,7 @@ public class StorageConfiguration {
     }
 
     @Bean
-    public StorageDriverInterface storageService() {
+    public StorageDriverInterface storageDriverInterface() {
         StorageEnum currentMainStorage = StorageEnum.MINIO;
         StorageDriverInterface storageClient = null;
 

@@ -40,7 +40,7 @@ public class AvatarUploadController {
 
             ////////// перенести в мікросервіс
             this.rabbitMQService.sendWebsocketMessageDTO(
-                    "websocket.message.sent",
+                    "websocket.message.send",
                     "/topic/avatars-ready",
                     "Your avatars are ready!",
                     null);

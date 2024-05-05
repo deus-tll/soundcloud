@@ -68,7 +68,8 @@ public class UploadController {
         if (!uploadInfo.isUploadInProgress()) {
             CompletableFuture.runAsync(() -> {
                 try {
-                    this.storageTempService.putContent(userService.getCurrentUser().getId(), userService.getCurrentUser().getUsername(), uploadURI, metadata);
+                    this.storageTempService.putContent(userService.getCurrentUser().getId(), uploadURI, metadata);
+                    //userService.getCurrentUser().getUsername();
 
 
                 } catch (Exception e) {

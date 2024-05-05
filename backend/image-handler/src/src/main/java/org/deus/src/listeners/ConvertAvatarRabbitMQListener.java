@@ -2,6 +2,9 @@ package org.deus.src.listeners;
 
 import lombok.AllArgsConstructor;
 import org.deus.datalayerstarter.dtos.auth.UserDTO;
+import org.deus.datalayerstarter.exceptions.data.DataIsNotPresentException;
+import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
+import org.deus.datalayerstarter.exceptions.message.MessageSendingException;
 import org.deus.rabbitmqstarter.services.RabbitMQService;
 import org.deus.src.services.ConvertAvatarService;
 import org.slf4j.Logger;
@@ -25,10 +28,38 @@ public class ConvertAvatarRabbitMQListener {
     public void convertAvatar(Message message) {
         Optional<Long> optionalUserId = this.rabbitMQService.receiveUserLongId(message);
 
-        optionalUserId.ifPresentOrElse(userId -> {
+        if (optionalUserId.isEmpty()) {
+            String errorMessage = "UserId was not present when trying to convert avatar";
+            logger.error(errorMessage);
+            this.rabbitMQService.sendWebsocketMessageDTO(
+                    "websocket.message.send",
+                    "/topic/avatar-error",
+                    errorMessage,
+                    null);
+
+            return;
+        }
+
+        Long userId = optionalUserId.get();
+
+        try {
             this.convertAvatarService.convertAvatar(userId);
-        }, () -> {
-            logger.error(UserDTO.class.getName() + " was not present when trying to convert avatar");
-        });
+
+            this.rabbitMQService.sendWebsocketMessageDTO(
+                    "websocket.message.send",
+                    "/topic/avatar-ready",
+                    "Your avatar is ready!",
+                    null);
+        }
+        catch (DataIsNotPresentException | DataProcessingException e) {
+            String errorMessage = "Some problems have occurred while trying to convert avatar";
+            logger.error(errorMessage + " for user with id \"" + userId + "\"", e);
+
+            this.rabbitMQService.sendWebsocketMessageDTO(
+                    "websocket.message.send",
+                    "/topic/avatar-error",
+                    errorMessage,
+                    null);
+        }
     }
 }

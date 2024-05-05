@@ -2,17 +2,15 @@ package org.deus.tusuploadfilestarter.config;
 
 import me.desair.tus.server.TusFileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(TusProperties.class)
 @PropertySource(value = "classpath:custom.properties")
 public class TusFileUploadConfiguration {
-
     private final TusProperties tusProperties;
 
     @Autowired
@@ -24,5 +22,10 @@ public class TusFileUploadConfiguration {
     public TusFileUploadService tusFileUploadService() {
         return new TusFileUploadService().withStoragePath(tusProperties.getUploadDirectory())
                 .withUploadUri("/api/upload/file");
+    }
+
+    @Bean
+    public String uploadDirectory() {
+        return tusProperties.getUploadDirectory();
     }
 }

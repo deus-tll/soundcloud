@@ -1,6 +1,9 @@
 package org.deus.src.services;
 
 import lombok.AllArgsConstructor;
+import org.deus.datalayerstarter.exceptions.data.DataIsNotPresentException;
+import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
+import org.deus.datalayerstarter.exceptions.data.DataSavingException;
 import org.deus.storagestarter.services.StorageAvatarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,31 +24,41 @@ public class ConvertAvatarService {
     private final StorageAvatarService storageAvatarService;
     private static final Logger logger = LoggerFactory.getLogger(ConvertAvatarService.class);
 
-    public void convertAvatar(long userId) {
+    public void convertAvatar(long userId) throws DataIsNotPresentException, DataProcessingException {
         Optional<byte[]> optionalOriginalBytes = storageAvatarService.getOriginalBytes(userId);
 
-        optionalOriginalBytes.ifPresentOrElse(originalBytes -> {
-            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                BufferedImage image = ImageIO.read(new ByteArrayInputStream(originalBytes));
+        if (optionalOriginalBytes.isEmpty()) {
+            String errorMessage = "OriginalBytes of requested avatar was not present when trying to convert";
+            logger.error(errorMessage);
+            throw new DataIsNotPresentException(errorMessage);
+        }
 
-                if (image == null) {
-                    throw new IOException("Failed to read image");
-                }
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(optionalOriginalBytes.get()));
 
-                boolean success = ImageIO.write(image, "webp", outputStream);
-
-                if (!success) {
-                    throw new IOException("Failed to convert image to WebP format");
-                }
-
-                byte[] webpData = outputStream.toByteArray();
-
-                storageAvatarService.putWebP(userId, webpData);
-            } catch (IOException e) {
-                logger.error("Error while converting avatar", e);
+            if (image == null) {
+                throw new IOException("Failed to read image");
             }
-        }, () -> {
-            logger.error("OriginalBytes of avatar was not present when trying to convert");
-        });
+
+            boolean success = ImageIO.write(image, "webp", outputStream);
+
+            if (!success) {
+                throw new IOException("Failed to convert image to WebP format");
+            }
+
+            byte[] webpData = outputStream.toByteArray();
+
+            storageAvatarService.putWebP(userId, webpData);
+        }
+        catch (IOException e) {
+            String errorMessage = "Error while converting avatar";
+            logger.error(errorMessage, e);
+            throw new DataProcessingException(errorMessage, e);
+        }
+        catch (DataSavingException e) {
+            String errorMessage = "Error while saving converted avatar";
+            logger.error(errorMessage, e);
+            throw new DataProcessingException(errorMessage, e);
+        }
     }
 }

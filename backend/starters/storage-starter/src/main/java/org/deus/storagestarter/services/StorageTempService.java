@@ -1,6 +1,7 @@
 package org.deus.storagestarter.services;
 
 import lombok.AllArgsConstructor;
+import org.deus.datalayerstarter.exceptions.data.*;
 import org.deus.storagestarter.drivers.StorageDriverInterface;
 import org.deus.storagestarter.exceptions.StorageException;
 import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
@@ -28,36 +29,56 @@ public class StorageTempService {
         return "/" + userId + "/" + fileId + "/originalBytes";
     }
 
-    public void putContent(long userId, String username, String uploadURI, Map<String, String> metadata) {
+    public void putContent(long userId, String uploadURI, Map<String, String> metadata) throws DataProcessingException, DataNotFoundException {
         Optional<InputStream> optionalInputStream = this.tusFileUploadWrapperService.getUploadedBytes(uploadURI);
 
-        optionalInputStream.ifPresentOrElse(inputStream -> {
-            try (InputStream is = inputStream) {
-                processInputStream(is, userId, metadata, uploadURI);
-            } catch (IOException e) {
-                logger.error("Error while processing uploaded bytes", e);
+        if (optionalInputStream.isPresent()) {
+            try (InputStream inputStream = optionalInputStream.get()) {
+                this.processInputStream(inputStream, userId, metadata, uploadURI);
             }
-        }, () -> {
-            logger.error("Uploaded bytes not found for URI: " + uploadURI);
-        });
+            catch (IOException | DataProcessingException | DataSavingException e) {
+                String errorMessage = "Error while processing uploaded bytes";
+                logger.error(errorMessage, e);
+                throw new DataProcessingException(errorMessage, e);
+            }
+        }
+        else {
+            String errorMessage = "Uploaded bytes not found for URI: " + uploadURI;
+            logger.error(errorMessage);
+            throw new DataNotFoundException(errorMessage);
+        }
     }
 
-    private void processInputStream(InputStream inputStream, long userId, Map<String, String> metadata, String uploadURI) throws IOException {
-        String fileId = metadata.get("fileId");
-        byte[] fileBytes = inputStream.readAllBytes();
-
-        storage.put(tempBucketName, buildPath(userId, fileId), fileBytes);
-
-        this.tusFileUploadWrapperService.deleteUpload(uploadURI);
+    private void processInputStream(InputStream inputStream, long userId, Map<String, String> metadata, String uploadURI) throws DataProcessingException, DataSavingException {
+        try {
+            String fileId = metadata.get("fileId");
+            byte[] fileBytes = inputStream.readAllBytes();
+            storage.put(tempBucketName, buildPath(userId, fileId), fileBytes);
+            this.tusFileUploadWrapperService.deleteUpload(uploadURI);
+        }
+        catch (IOException | OutOfMemoryError e) {
+            String errorMessage = "Error while trying to read bytes from provided InputStream";
+            logger.error(errorMessage, e);
+            throw new DataProcessingException(errorMessage, e);
+        }
+        catch (StorageException e) {
+            String errorMessage = "Error while storing uploaded bytes";
+            logger.error(errorMessage, e);
+            throw new DataSavingException(errorMessage, e);
+        }
+        catch (DataDeletingException e) {
+            throw new DataProcessingException( e);
+        }
     }
 
-    public byte[] getOriginalBytes(long userId, String fileId) {
+    public byte[] getOriginalBytes(long userId, String fileId) throws DataRetrievingException {
         try {
             return storage.getBytes(tempBucketName, buildPath(userId, fileId));
         }
         catch (StorageException e) {
-            logger.error("", e);
-            throw new RuntimeException(e);
+            String errorMessage = "Error while retrieving original bytes";
+            logger.error(errorMessage, e);
+            throw new DataRetrievingException(errorMessage, e);
         }
     }
 

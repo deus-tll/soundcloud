@@ -9,6 +9,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -22,23 +23,26 @@ public class RabbitMQListener {
     private final RabbitMQService rabbitMQService;
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQListener.class);
     @RabbitListener(queues = "websocket.message.send")
-    public void websocketMessageSent(Message message) {
+    public void websocketMessageSend(Message message) {
         Optional<WebsocketMessageDTO> optionalWebsocketMessageDTO = this.rabbitMQService.receiveWebsocketMessageDTO(message);
 
-        optionalWebsocketMessageDTO.ifPresentOrElse(websocketMessageDTO -> {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-            try {
-                messagingTemplate.convertAndSendToUser(
-                        username,
-                        websocketMessageDTO.getDestination(),
-                        websocketMessageDTO.getPayload().toJson()
-                );
-            } catch (Exception e) {
-                logger.error("Error while trying to send message via websocket", e);
-            }
-        }, () -> {
+        if (optionalWebsocketMessageDTO.isEmpty()) {
             logger.error(WebsocketMessageDTO.class.getName() + " was not present when trying to send message via websocket");
-        });
+            return;
+        }
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        WebsocketMessageDTO websocketMessageDTO = optionalWebsocketMessageDTO.get();
+
+        try {
+            messagingTemplate.convertAndSendToUser(
+                    username,
+                    websocketMessageDTO.getDestination(),
+                    websocketMessageDTO.getPayload().toJson()
+            );
+        } catch (Exception e) {
+            logger.error("Error while trying to send message via websocket", e);
+        }
     }
 }

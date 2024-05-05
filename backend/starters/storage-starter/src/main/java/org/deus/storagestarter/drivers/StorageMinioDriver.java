@@ -7,6 +7,7 @@ import io.minio.PutObjectArgs;
 import io.minio.errors.*;
 import io.minio.messages.Bucket;
 import org.deus.storagestarter.exceptions.StorageException;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
+@Component
 public class StorageMinioDriver implements StorageDriverInterface{
     private final MinioClient minioClient;
     private final Set<String> existingBuckets;
@@ -25,7 +27,7 @@ public class StorageMinioDriver implements StorageDriverInterface{
         this.existingBuckets = cacheExistingBuckets();
     }
 
-    private Set<String> cacheExistingBuckets() throws RuntimeException {
+    private Set<String> cacheExistingBuckets() {
         Set<String> buckets = new HashSet<>();
         try {
             for (Bucket bucket : minioClient.listBuckets()) {

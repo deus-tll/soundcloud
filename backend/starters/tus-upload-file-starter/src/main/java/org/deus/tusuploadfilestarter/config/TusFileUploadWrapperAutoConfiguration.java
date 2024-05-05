@@ -3,28 +3,22 @@ package org.deus.tusuploadfilestarter.config;
 import me.desair.tus.server.TusFileUploadService;
 import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
-@Configuration
-@EnableConfigurationProperties(TusProperties.class)
-@PropertySource(value = "classpath:custom.properties")
-@ComponentScan
+@AutoConfiguration
 public class TusFileUploadWrapperAutoConfiguration {
     private final TusFileUploadService tusFileUploadService;
-    private final TusProperties tusProperties;
+    private final String uploadDirectory;
 
     @Autowired
-    public TusFileUploadWrapperAutoConfiguration(TusFileUploadService tusFileUploadService, TusProperties tusProperties) {
+    public TusFileUploadWrapperAutoConfiguration(TusFileUploadService tusFileUploadService, String uploadDirectory) {
         this.tusFileUploadService = tusFileUploadService;
-        this.tusProperties = tusProperties;
+        this.uploadDirectory = uploadDirectory;
     }
 
     @Bean
     public TusFileUploadWrapperService tusFileUploadWrapperService() {
-        return new TusFileUploadWrapperService(tusFileUploadService, tusProperties);
+        return new TusFileUploadWrapperService(tusFileUploadService, uploadDirectory);
     }
 }

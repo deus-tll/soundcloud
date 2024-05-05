@@ -1,7 +1,7 @@
 package org.deus.src.controllers.songs;
 
 import org.deus.datalayerstarter.dtos.song.SongDTO;
-import org.deus.datalayerstarter.models.SongModel;
+import org.deus.src.models.SongModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
