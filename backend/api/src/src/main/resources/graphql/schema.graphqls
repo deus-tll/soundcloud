@@ -1,0 +1,32 @@
+type Query {
+    songById(id: ID!): SongDTO
+    allSongs:[SongDTO!]!
+    performerById(id: ID!): PerformerDTO
+    allPerformers: [PerformerDTO!]!
+}
+
+type SongDTO {
+    id: ID!
+    name: String!
+    uploader: UserDTO!
+    performers: [PerformerDTO!]!
+}
+
+type PerformerDTO {
+    id: ID!
+    name: String!
+    user: UserDTO!
+    songs: [SongDTO!]!
+}
+
+type UserDTO {
+    id: ID!
+    username: String!
+    email: String!
+    role: RoleEnum!
+}
+
+enum RoleEnum {
+    USER
+    ADMIN
+}

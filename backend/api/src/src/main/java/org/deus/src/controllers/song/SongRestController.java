@@ -1,4 +1,4 @@
-package org.deus.src.controllers.songs;
+package org.deus.src.controllers.song;
 
 import org.deus.datalayerstarter.dtos.song.SongDTO;
 import org.deus.src.models.SongModel;
@@ -6,11 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/songs")
-public class SongController {
+public class SongRestController {
     @PostMapping
     public ResponseEntity<SongDTO> createSong(@RequestBody SongModel song) {
 

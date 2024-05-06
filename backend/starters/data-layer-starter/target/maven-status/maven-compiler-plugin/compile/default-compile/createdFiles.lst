@@ -8,7 +8,8 @@ org\deus\datalayerstarter\exceptions\data\DataIsNotPresentException.class
 org\deus\datalayerstarter\dtos\websocket\WebsocketMessageDTO.class
 org\deus\datalayerstarter\exceptions\data\DataNotFoundException.class
 org\deus\datalayerstarter\exceptions\data\DataSavingException.class
+org\deus\datalayerstarter\dtos\SongDTO.class
+org\deus\datalayerstarter\dtos\PerformerDTO.class
 org\deus\datalayerstarter\exceptions\data\DataRetrievingException.class
 org\deus\datalayerstarter\exceptions\message\MessageSendingException.class
-org\deus\datalayerstarter\dtos\song\SongDTO.class
 org\deus\datalayerstarter\exceptions\data\DataDeletingException.class

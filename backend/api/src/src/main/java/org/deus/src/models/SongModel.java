@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.deus.datalayerstarter.dtos.PerformerDTO;
+import org.deus.datalayerstarter.dtos.SongDTO;
 import org.deus.src.models.auth.UserModel;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -25,4 +28,19 @@ public class SongModel extends BaseEntity {
     @ManyToMany(mappedBy = "songs")
     @Schema(description = "Performers")
     private Set<PerformerModel> performers;
+
+    public SongDTO mapToSongDTO() {
+        return new SongDTO(
+                this.getId(),
+                this.getName(),
+                this.getUploader().mapUserToDTO(),
+                this.getPerformers().stream()
+                        .map(performerModel -> new PerformerDTO(
+                                performerModel.getId(),
+                                performerModel.getName(),
+                                performerModel.getUser().mapUserToDTO(),
+                                null))
+                        .collect(Collectors.toSet())
+        );
+    }
 }

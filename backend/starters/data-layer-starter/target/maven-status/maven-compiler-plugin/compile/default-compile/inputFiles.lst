@@ -9,6 +9,7 @@ D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-laye
 D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\exceptions\data\DataDeletingException.java
 D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\errors\ErrorResponseDTO.java
 D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\websocket\WebsocketMessageDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\PerformerDTO.java
+D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\SongDTO.java
 D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\exceptions\data\DataProcessingException.java
-D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\dtos\song\SongDTO.java
 D:\projects\academic-projects\backend\java\soundcloud\backend\starters\data-layer-starter\src\main\java\org\deus\datalayerstarter\exceptions\data\DataSavingException.java

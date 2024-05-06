@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.deus.datalayerstarter.dtos.auth.UserDTO;
 import org.deus.datalayerstarter.enums.auth.RoleEnum;
 import org.deus.src.models.BaseEntity;
 import org.deus.src.models.PerformerModel;
@@ -63,6 +64,9 @@ public class UserModel  extends BaseEntity implements UserDetails {
     @Schema(description = "User's songs")
     protected Set<SongModel> songs;
 
+    public UserDTO mapUserToDTO() {
+        return new UserDTO(this.getId(), this.getUsername(), this.getEmail(), this.getRole());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
