@@ -64,6 +64,16 @@ public class UserModel  extends BaseEntity implements UserDetails {
     @Schema(description = "User's songs")
     protected Set<SongModel> songs;
 
+    public static UserDTO mapUserToDTO(UserModel userModel) {
+        UserDTO userDTO = null;
+
+        if (userModel != null) {
+            userDTO = userModel.mapUserToDTO();
+        }
+
+        return userDTO;
+    }
+
     public UserDTO mapUserToDTO() {
         return new UserDTO(this.getId(), this.getUsername(), this.getEmail(), this.getRole());
     }

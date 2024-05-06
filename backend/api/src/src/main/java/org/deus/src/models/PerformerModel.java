@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.deus.datalayerstarter.dtos.PerformerDTO;
 import org.deus.datalayerstarter.dtos.SongDTO;
+import org.deus.datalayerstarter.dtos.auth.UserDTO;
 import org.deus.src.models.auth.UserModel;
 
 import java.util.Set;
@@ -38,7 +39,7 @@ public class PerformerModel extends BaseEntity {
         return new PerformerDTO(
                 this.getId(),
                 this.getName(),
-                this.getUser().mapUserToDTO(),
+                UserModel.mapUserToDTO(this.getUser()),
                 this.getSongs().stream()
                         .map(songModel -> new SongDTO(
                                 songModel.getId(),
