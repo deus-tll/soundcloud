@@ -14,9 +14,8 @@ import org.springframework.stereotype.Component;
 public class PerformerResolver implements GraphQLResolver<PerformerDTO> {
     private final UserRepository userRepository;
 
-    public UserDTO getUserDTO(PerformerDTO performerDTO) {
-
-
-        UserModel userModel = userRepository.
+    public UserDTO getUser(PerformerDTO performerDTO) {
+        UserModel userModel = userRepository.findById(performerDTO.getUser().getId()).orElse(null);
+        return UserModel.mapUserToDTO(userModel);
     }
 }
