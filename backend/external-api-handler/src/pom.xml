@@ -44,23 +44,6 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-
-		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>storage-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>data-layer-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>rabbitmq-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<build>

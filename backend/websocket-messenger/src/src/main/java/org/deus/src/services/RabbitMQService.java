@@ -36,9 +36,9 @@ public class RabbitMQService {
         }
     }
 
-    public void sendWebsocketMessageDTO(String queueName, String websocketDestination, String payloadMessage, Object payloadData) {
+    public void sendWebsocketMessageDTO(String queueName, String username, String websocketDestination, String payloadMessage, Object payloadData) {
         PayloadDTO payloadDTO = new PayloadDTO(payloadMessage, payloadData);
-        WebsocketMessageDTO websocketMessageDTO = new WebsocketMessageDTO(websocketDestination, payloadDTO);
+        WebsocketMessageDTO websocketMessageDTO = new WebsocketMessageDTO(websocketDestination, username, payloadDTO);
 
         try {
             rabbitTemplate.convertAndSend(queueName, websocketMessageDTO.toJson());

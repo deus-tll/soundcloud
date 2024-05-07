@@ -12,14 +12,15 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Component
+@Service
 @AllArgsConstructor
 public class RabbitMQService {
     private final RabbitTemplate rabbitTemplate;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQService.class);
 
     public <T> Optional<T> deserializeMessage(Message message, Class<T> targetClass) {

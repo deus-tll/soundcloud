@@ -1,6 +1,7 @@
 package org.deus.src.listeners;
 
 import lombok.AllArgsConstructor;
+import org.deus.src.dtos.fromModels.UserDTO;
 import org.deus.src.exceptions.data.DataIsNotPresentException;
 import org.deus.src.exceptions.data.DataProcessingException;
 import org.deus.src.services.ConvertAvatarService;
@@ -22,18 +23,21 @@ public class ConvertAvatarRabbitMQListener {
 
     @RabbitListener(queues = "convert.avatar")
     public void convertAvatar(Message message) {
-        Optional<Long> optionalUserId = this.rabbitMQService.receiveUserLongId(message);
+        Optional<UserDTO> optionalUserDTO = this.rabbitMQService.receiveUserDTO(message);
 
-        if (optionalUserId.isEmpty()) {
+        if (optionalUserDTO.isEmpty()) {
             logger.error("UserId was not present when trying to convert avatar");
             this.sendErrorMessage();
             return;
         }
 
-        Long userId = optionalUserId.get();
+        UserDTO userDTO = optionalUserDTO.get();
 
         try {
-            this.convertAvatarService.convertAvatar(userId);
+            this.convertAvatarService.convertAvatar(userDTO.getId());
+
+            String username = userDTO.getUsername();
+
             this.rabbitMQService.sendWebsocketMessageDTO(
                     "websocket.message.send",
                     "/topic/avatar.ready",
@@ -41,7 +45,7 @@ public class ConvertAvatarRabbitMQListener {
                     null);
         }
         catch (DataIsNotPresentException | DataProcessingException e) {
-            logger.error("Some problems have occurred while trying to convert avatar for user with id \"" + userId + "\"", e);
+            logger.error("Some problems have occurred while trying to convert avatar for user with id \"" + userDTO.getId() + "\"", e);
             this.sendErrorMessage();
         }
     }

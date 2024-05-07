@@ -9,7 +9,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
@@ -28,13 +27,11 @@ public class RabbitMQListener {
             return;
         }
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
         WebsocketMessageDTO websocketMessageDTO = optionalWebsocketMessageDTO.get();
 
         try {
             messagingTemplate.convertAndSendToUser(
-                    username,
+                    websocketMessageDTO.getUsername(),
                     websocketMessageDTO.getDestination(),
                     websocketMessageDTO.getPayload().toJson()
             );

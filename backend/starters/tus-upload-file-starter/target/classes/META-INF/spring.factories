@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.deus.tusuploadfilestarter.config.TusFileUploadWrapperAutoConfiguration,org.deus.tusuploadfilestarter.config.TusFileUploadConfiguration
