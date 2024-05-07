@@ -1,7 +1,7 @@
 package org.deus.src.services;
 
 import lombok.RequiredArgsConstructor;
-import org.deus.datalayerstarter.dtos.PerformerDTO;
+import org.deus.src.dtos.fromModels.PerformerDTO;
 import org.deus.src.models.PerformerModel;
 import org.deus.src.repositories.PerformerRepository;
 import org.springframework.stereotype.Service;

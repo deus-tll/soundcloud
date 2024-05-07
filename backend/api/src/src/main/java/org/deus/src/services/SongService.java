@@ -1,7 +1,7 @@
 package org.deus.src.services;
 
 import lombok.RequiredArgsConstructor;
-import org.deus.datalayerstarter.dtos.SongDTO;
+import org.deus.src.dtos.fromModels.SongDTO;
 import org.deus.src.models.SongModel;
 import org.deus.src.repositories.SongRepository;
 import org.springframework.stereotype.Service;

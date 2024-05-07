@@ -1,22 +1,20 @@
 package org.deus.src.listeners;
 
 import lombok.AllArgsConstructor;
-import org.deus.datalayerstarter.exceptions.data.DataIsNotPresentException;
-import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
-import org.deus.rabbitmqstarter.services.RabbitMQService;
+import org.deus.src.exceptions.data.DataIsNotPresentException;
+import org.deus.src.exceptions.data.DataProcessingException;
 import org.deus.src.services.ConvertAvatarService;
+import org.deus.src.services.RabbitMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Optional;
 
 @Configuration
 @AllArgsConstructor
-@ComponentScan(basePackageClasses = {RabbitMQService.class})
 public class ConvertAvatarRabbitMQListener {
     private final RabbitMQService rabbitMQService;
     private final ConvertAvatarService convertAvatarService;

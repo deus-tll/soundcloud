@@ -1,6 +1,6 @@
 package org.deus.src.config.exceptions;
 
-import org.deus.datalayerstarter.dtos.errors.ErrorResponseDTO;
+import org.deus.src.dtos.errors.ErrorResponseDTO;
 import org.deus.src.exceptions.StatusException;
 
 import org.springframework.http.HttpStatus;

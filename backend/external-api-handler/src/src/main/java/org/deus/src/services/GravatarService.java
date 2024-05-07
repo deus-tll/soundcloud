@@ -1,6 +1,6 @@
 package org.deus.src.services;
 
-import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
+import org.deus.src.exceptions.data.DataProcessingException;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;

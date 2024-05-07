@@ -2,6 +2,8 @@ package org.deus.src.config;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,6 +34,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer {
     private final RestTemplate restTemplate;
     private final String authServiceUrl;
+    private static final Logger logger = LoggerFactory.getLogger(WebsocketConfiguration.class);
 
     public WebsocketConfiguration() {
         this.restTemplate = new RestTemplate();

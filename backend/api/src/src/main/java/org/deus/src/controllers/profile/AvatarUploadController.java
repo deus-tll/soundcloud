@@ -1,17 +1,14 @@
 package org.deus.src.controllers.profile;
 
-import org.deus.datalayerstarter.exceptions.data.DataSavingException;
-import org.deus.datalayerstarter.exceptions.message.MessageSendingException;
-import org.deus.rabbitmqstarter.services.RabbitMQService;
-import org.deus.src.SrcApplication;
 import org.deus.src.exceptions.StatusException;
+import org.deus.src.exceptions.data.DataSavingException;
+import org.deus.src.exceptions.message.MessageSendingException;
+import org.deus.src.services.RabbitMQService;
 import org.deus.src.services.auth.UserService;
 
-import org.deus.storagestarter.drivers.StorageDriverInterface;
-import org.deus.storagestarter.services.StorageAvatarService;
+import org.deus.src.services.storage.StorageAvatarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +24,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping("api/profile/avatar")
 @RequiredArgsConstructor
-@ComponentScan(basePackageClasses = {StorageAvatarService.class, RabbitMQService.class})
 public class AvatarUploadController {
     private final StorageAvatarService avatarService;
     private final UserService userService;

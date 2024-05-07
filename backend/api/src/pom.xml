@@ -107,24 +107,22 @@
 
 
 		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>storage-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+			<version>8.5.9</version>
 		</dependency>
+
+
 		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>tus-upload-file-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.graphql-java-kickstart</groupId>
+			<artifactId>graphql-spring-boot-starter</artifactId>
+			<version>15.0.0</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>data-layer-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.deus</groupId>
-			<artifactId>rabbitmq-starter</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.graphql-java</groupId>
+			<artifactId>graphql-java-tools</artifactId>
+			<version>5.2.4</version>
 		</dependency>
 	</dependencies>
 

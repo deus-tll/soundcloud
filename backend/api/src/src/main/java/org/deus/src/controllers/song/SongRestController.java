@@ -1,6 +1,6 @@
 package org.deus.src.controllers.song;
 
-import org.deus.datalayerstarter.dtos.song.SongDTO;
+import org.deus.src.dtos.fromModels.SongDTO;
 import org.deus.src.models.SongModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

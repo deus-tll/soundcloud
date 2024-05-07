@@ -15,7 +15,7 @@ type SongDTO {
 type PerformerDTO {
     id: ID!
     name: String!
-    user: UserDTO!
+    user: UserDTO
     songs: [SongDTO!]!
 }
 

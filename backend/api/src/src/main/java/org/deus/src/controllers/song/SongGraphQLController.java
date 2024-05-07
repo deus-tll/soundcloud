@@ -1,7 +1,7 @@
 package org.deus.src.controllers.song;
 
 import lombok.RequiredArgsConstructor;
-import org.deus.datalayerstarter.dtos.SongDTO;
+import org.deus.src.dtos.fromModels.SongDTO;
 import org.deus.src.services.SongService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;

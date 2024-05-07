@@ -1,15 +1,17 @@
 package org.deus.src.services.auth;
 
-import org.deus.datalayerstarter.dtos.auth.UserDTO;
-import org.deus.datalayerstarter.enums.auth.RoleEnum;
-import org.deus.rabbitmqstarter.services.RabbitMQService;
+import org.deus.src.dtos.fromModels.UserDTO;
+import org.deus.src.enums.RoleEnum;
 import org.deus.src.exceptions.StatusException;
+import org.deus.src.exceptions.message.MessageSendingException;
 import org.deus.src.models.auth.UserModel;
 import org.deus.src.requests.auth.SignInRequest;
 import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
 
-import org.springframework.context.annotation.ComponentScan;
+import org.deus.src.services.RabbitMQService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,29 +24,33 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@ComponentScan(basePackageClasses = {RabbitMQService.class})
 public class AuthenticationService {
     private final UserService userService;
     private final JwtService jwtService;
     private final RabbitMQService rabbitMQService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     public JwtAuthenticationResponse signUp(SignUpRequest request) throws StatusException {
         UserModel user = UserModel.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(RoleEnum.ROLE_USER)
+                .role(RoleEnum.USER)
                 .build();
 
         userService.create(user);
 
         UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
 
-        rabbitMQService.sendUserDTO("user.register", userDTO);
-
         String jwt = jwtService.generateToken(user);
+
+        try {
+            rabbitMQService.sendUserDTO("user.register", userDTO);
+        } catch (MessageSendingException e) {
+            logger.error("Something went wrong while trying to inform other microservices about user's registration", e);
+        }
 
         return new JwtAuthenticationResponse(jwt, userDTO);
     }

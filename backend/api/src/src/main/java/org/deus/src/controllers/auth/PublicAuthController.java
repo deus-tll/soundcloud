@@ -1,6 +1,6 @@
 package org.deus.src.controllers.auth;
 
-import org.deus.datalayerstarter.dtos.auth.UserDTO;
+import org.deus.src.dtos.fromModels.UserDTO;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.models.auth.UserModel;
 import org.deus.src.requests.auth.SignInRequest;

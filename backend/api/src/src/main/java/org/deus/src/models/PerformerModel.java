@@ -4,9 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.deus.datalayerstarter.dtos.PerformerDTO;
-import org.deus.datalayerstarter.dtos.SongDTO;
-import org.deus.datalayerstarter.dtos.auth.UserDTO;
+import org.deus.src.dtos.fromModels.PerformerDTO;
+import org.deus.src.dtos.fromModels.SongDTO;
 import org.deus.src.models.auth.UserModel;
 
 import java.util.Set;
@@ -26,7 +25,7 @@ public class PerformerModel extends BaseEntity {
     @Schema(description = "Indicator of whether the performer is user")
     private UserModel user;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "performers_songs",
             joinColumns = { @JoinColumn(name = "performer_id") },

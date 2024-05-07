@@ -1,18 +1,15 @@
 package org.deus.src.controllers;
 
 import lombok.AllArgsConstructor;
-import org.deus.datalayerstarter.exceptions.data.DataNotFoundException;
-import org.deus.datalayerstarter.exceptions.data.DataProcessingException;
-import org.deus.rabbitmqstarter.services.RabbitMQService;
-import org.deus.src.SrcApplication;
+import org.deus.src.exceptions.data.DataNotFoundException;
+import org.deus.src.exceptions.data.DataProcessingException;
+import org.deus.src.services.RabbitMQService;
+import org.deus.src.services.TusFileUploadWrapperService;
 import org.deus.src.services.auth.UserService;
 
-import org.deus.storagestarter.services.StorageTempService;
-import org.deus.tusuploadfilestarter.services.TusFileUploadWrapperService;
-
+import org.deus.src.services.storage.StorageTempService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,7 +29,6 @@ import me.desair.tus.server.upload.UploadInfo;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/upload")
-@ComponentScan(basePackageClasses = {TusFileUploadWrapperService.class, StorageTempService.class})
 public class UploadController {
     private final TusFileUploadWrapperService tusFileUploadWrapperService;
     private final StorageTempService storageTempService;
