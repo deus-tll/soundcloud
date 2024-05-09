@@ -38,11 +38,11 @@ public class GravatarRabbitMQListener {
 
         if (optionalUserDTO.isEmpty()) {
             logger.error(UserDTO.class.getName() + " was not present when trying to get gravatar's result");
-            this.sendErrorMessage();
             return;
         }
 
         UserDTO userDTO = optionalUserDTO.get();
+        String username = userDTO.getUsername();
 
         try {
             String gravatarUrl = this.gravatarService.getGravatarUrl(userDTO.getEmail());
@@ -51,18 +51,20 @@ public class GravatarRabbitMQListener {
         }
         catch (DataProcessingException | DataSavingException e) {
             logger.error("Error while getting gravatar's result", e);
-            this.sendErrorMessage();
+            this.sendErrorMessage(username);
         }
         catch (MessageSendingException e) {
             logger.error("Error while trying to send gravatar's result to microservice for converting", e);
-            this.sendErrorMessage();
+            this.sendErrorMessage(username);
         }
     }
 
-    private void sendErrorMessage() {
+    private void sendErrorMessage(String username) {
         String errorMessage = "Something went wrong while trying to get user's avatar with service gravatar. We'll try later";
+
         this.rabbitMQService.sendWebsocketMessageDTO(
                 "websocket.message.send",
+                username,
                 "/topic/error",
                 errorMessage,
                 null);

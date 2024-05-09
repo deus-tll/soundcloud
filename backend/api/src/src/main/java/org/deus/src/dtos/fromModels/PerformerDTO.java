@@ -13,5 +13,4 @@ public class PerformerDTO {
     private Long id;
     private String name;
     private UserDTO user;
-    private Set<SongDTO> songs;
 }

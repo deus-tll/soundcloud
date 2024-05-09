@@ -3,6 +3,7 @@ package org.deus.src.controllers;
 import lombok.AllArgsConstructor;
 import org.deus.src.exceptions.data.DataNotFoundException;
 import org.deus.src.exceptions.data.DataProcessingException;
+import org.deus.src.models.auth.UserModel;
 import org.deus.src.services.RabbitMQService;
 import org.deus.src.services.TusFileUploadWrapperService;
 import org.deus.src.services.auth.UserService;
@@ -68,26 +69,27 @@ public class UploadController {
 
         if (!uploadInfo.isUploadInProgress()) {
             CompletableFuture.runAsync(() -> {
-                Long userId = userService.getCurrentUser().getId();
+                UserModel user = userService.getCurrentUser();
 
                 try {
-                    this.storageTempService.putContent(userId, uploadURI, metadata);
+                    this.storageTempService.putContent(user.getId(), uploadURI, metadata);
 
                     this.rabbitMQService.sendWebsocketMessageDTO(
                             "websocket.message.send",
+                            user.getUsername(),
                             "/topic/file.upload.ready." + metadata.get("fileId"),
                             "Your avatar is ready!",
                             null);
                 }
                 catch (DataNotFoundException | DataProcessingException e) {
-                    logger.error("Error during storing file upload with URI \"" + uploadURI + "\", for user with id \"" + userId + "\" and metadata: [" + metadata.toString() + "]", e);
+                    logger.error("Error during storing file upload with URI \"" + uploadURI + "\", for user with id \"" + user.getId() + "\" and metadata: [" + metadata.toString() + "]", e);
                 }
             });
         }
     }
 
     @PostMapping("/request")
-    public ResponseEntity<?> requestUpload() {
+    public ResponseEntity<String> requestUpload() {
         String fileId = UUID.randomUUID().toString();
         return new ResponseEntity<>(fileId, HttpStatus.CREATED);
     }

@@ -25,7 +25,7 @@ public class PerformerModel extends BaseEntity {
     @Schema(description = "Indicator of whether the performer is user")
     private UserModel user;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "performers_songs",
             joinColumns = { @JoinColumn(name = "performer_id") },
@@ -38,14 +38,7 @@ public class PerformerModel extends BaseEntity {
         return new PerformerDTO(
                 this.getId(),
                 this.getName(),
-                UserModel.mapUserToDTO(this.getUser()),
-                this.getSongs().stream()
-                        .map(songModel -> new SongDTO(
-                                songModel.getId(),
-                                songModel.getName(),
-                                songModel.getUploader().mapUserToDTO(),
-                                null))
-                        .collect(Collectors.toSet())
+                UserModel.mapUserToDTO(this.getUser())
         );
     }
 }

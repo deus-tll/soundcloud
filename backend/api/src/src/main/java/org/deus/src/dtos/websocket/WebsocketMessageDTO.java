@@ -12,5 +12,6 @@ import org.deus.src.dtos.JsonSerializer;
 @NoArgsConstructor
 public class WebsocketMessageDTO extends JsonSerializer {
     private String destination;
+    private String username;
     private PayloadDTO payload;
 }

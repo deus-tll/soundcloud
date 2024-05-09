@@ -6,12 +6,10 @@ import org.deus.src.config.storage.properties.S3StorageProperties;
 import org.deus.src.drivers.StorageDriverInterface;
 import org.deus.src.drivers.StorageMinioDriver;
 import org.deus.src.enums.StorageEnum;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties({MinioStorageProperties.class, S3StorageProperties.class})
 public class StorageConfiguration {
     @Bean
     public StorageDriverInterface storageDriverInterface(MinioStorageProperties minioStorageProperties, S3StorageProperties s3StorageProperties) {

@@ -25,7 +25,7 @@ public class SongModel extends BaseEntity {
     @Schema(description = "Uploader")
     private UserModel uploader;
 
-    @ManyToMany(mappedBy = "songs", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "songs")
     @Schema(description = "Performers")
     private Set<PerformerModel> performers;
 
@@ -38,8 +38,7 @@ public class SongModel extends BaseEntity {
                         .map(performerModel -> new PerformerDTO(
                                 performerModel.getId(),
                                 performerModel.getName(),
-                                UserModel.mapUserToDTO(performerModel.getUser()),
-                                null))
+                                UserModel.mapUserToDTO(performerModel.getUser())))
                         .collect(Collectors.toSet())
         );
     }

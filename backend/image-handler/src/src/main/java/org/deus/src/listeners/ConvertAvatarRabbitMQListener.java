@@ -27,7 +27,6 @@ public class ConvertAvatarRabbitMQListener {
 
         if (optionalUserDTO.isEmpty()) {
             logger.error("UserId was not present when trying to convert avatar");
-            this.sendErrorMessage();
             return;
         }
 
@@ -36,26 +35,22 @@ public class ConvertAvatarRabbitMQListener {
         try {
             this.convertAvatarService.convertAvatar(userDTO.getId());
 
-            String username = userDTO.getUsername();
-
             this.rabbitMQService.sendWebsocketMessageDTO(
                     "websocket.message.send",
+                    userDTO.getUsername(),
                     "/topic/avatar.ready",
                     "Your avatar is ready!",
                     null);
         }
         catch (DataIsNotPresentException | DataProcessingException e) {
             logger.error("Some problems have occurred while trying to convert avatar for user with id \"" + userDTO.getId() + "\"", e);
-            this.sendErrorMessage();
-        }
-    }
 
-    private void sendErrorMessage() {
-        String errorMessage = "Something went wrong while trying to prepare user's avatar. Please try later";
-        this.rabbitMQService.sendWebsocketMessageDTO(
-                "websocket.message.send",
-                "/topic/error",
-                errorMessage,
-                null);
+            this.rabbitMQService.sendWebsocketMessageDTO(
+                    "websocket.message.send",
+                    userDTO.getUsername(),
+                    "/topic/error",
+                    "Something went wrong while trying to prepare user's avatar. Please try later",
+                    null);
+        }
     }
 }
