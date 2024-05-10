@@ -7,6 +7,8 @@ import me.desair.tus.server.exception.TusException;
 import me.desair.tus.server.upload.UploadInfo;
 import org.deus.src.config.tus.TusProperties;
 import org.deus.src.exceptions.data.DataDeletingException;
+import org.deus.src.services.auth.UserService;
+import org.deus.src.services.storage.StorageTempService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class TusFileUploadWrapperService {
     private final Path tusUploadDirectory;
     private static final Logger logger = LoggerFactory.getLogger(TusFileUploadWrapperService.class);
 
-    public TusFileUploadWrapperService(TusFileUploadService tusFileUploadService, TusProperties tusProperties) {
+    public TusFileUploadWrapperService(TusFileUploadService tusFileUploadService, StorageTempService storageTempService, UserService userService, RabbitMQService rabbitMQService, TusProperties tusProperties) {
         this.tusFileUploadService = tusFileUploadService;
         this.tusUploadDirectory = Path.of(tusProperties.getUploadDirectory());
     }

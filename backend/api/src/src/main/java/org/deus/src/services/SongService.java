@@ -11,6 +11,8 @@ import org.deus.src.repositories.SongRepository;
 import org.deus.src.requests.song.SongCreateRequest;
 import org.deus.src.requests.song.SongUpdateRequest;
 import org.deus.src.services.auth.UserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,7 @@ public class SongService {
     private final RabbitMQService rabbitMQService;
     private final UserService userService;
 
+    @CacheEvict(value = "songs", allEntries = true)
     public SongDTO create(SongCreateRequest request) throws StatusException {
         UserModel uploader = userService.getCurrentUser();
         Set<PerformerModel> performers = getPerformersFromIds(request.getPerformerIds());
@@ -53,6 +56,7 @@ public class SongService {
         return savedSong.mapToSongDTO();
     }
 
+    @CacheEvict(value = "songs", allEntries = true)
     public SongDTO update(Long id, SongUpdateRequest request) throws StatusException {
         SongModel song = songRepository.findById(id).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
 
@@ -72,16 +76,19 @@ public class SongService {
         return updatedSong.mapToSongDTO();
     }
 
+    @Cacheable(value = "performers", key = "#id")
     public SongDTO getById(Long id) throws StatusException {
         Optional<SongModel> optionalSongModel = songRepository.findById(id);
         return optionalSongModel.map(SongModel::mapToSongDTO).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
     }
 
+    @Cacheable(value = "performers", key = "#pageable.pageNumber")
     public Page<SongDTO> getAll(Pageable pageable) {
         Page<SongModel> songs = songRepository.findAll(pageable);
         return songs.map(SongModel::mapToSongDTO);
     }
 
+    @CacheEvict(value = "songs", allEntries = true)
     public void deleteById(Long id) throws StatusException {
         if (!songRepository.existsById(id)) {
             throw new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND);

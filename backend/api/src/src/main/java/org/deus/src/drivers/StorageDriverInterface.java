@@ -8,4 +8,7 @@ public interface StorageDriverInterface {
 
     public void put(String bucketName, String path, byte[] bytes)
             throws StorageException;
+
+    public boolean isFileExists(String bucketName, String path)
+            throws StorageException;
 }
