@@ -47,7 +47,7 @@ public class GravatarRabbitMQListener {
         try {
             String gravatarUrl = this.gravatarService.getGravatarUrl(userDTO.getEmail());
             this.storageAvatarService.gravatarDownloadAndPut(userDTO.getId(), gravatarUrl);
-            this.rabbitMQService.sendUserId("convert.avatar", userDTO.getId());
+            this.rabbitMQService.sendUserDTO("convert.avatar", userDTO);
         }
         catch (DataProcessingException | DataSavingException e) {
             logger.error("Error while getting gravatar's result", e);

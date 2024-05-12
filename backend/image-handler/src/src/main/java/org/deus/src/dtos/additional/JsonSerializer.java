@@ -1,4 +1,4 @@
-package org.deus.src.dtos;
+package org.deus.src.dtos.additional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

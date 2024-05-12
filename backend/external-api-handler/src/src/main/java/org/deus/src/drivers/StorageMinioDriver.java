@@ -1,9 +1,6 @@
 package org.deus.src.drivers;
 
-import io.minio.GetObjectArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Bucket;
 import org.deus.src.exceptions.StorageException;
@@ -85,11 +82,29 @@ public class StorageMinioDriver implements StorageDriverInterface{
                             .build()
             );
         }
-        catch (RuntimeException | IOException | InvalidKeyException | NoSuchAlgorithmException |
+        catch (IOException | InvalidKeyException | NoSuchAlgorithmException |
                ServerException | InsufficientDataException |
                ErrorResponseException | InvalidResponseException |
                XmlParserException | InternalException e) {
             throw new StorageException("Error putting bytes", e);
+        }
+    }
+
+    @Override
+    public boolean isFileExists(String bucketName, String path) throws StorageException {
+        try {
+            minioClient.statObject(StatObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(path).build());
+            return true;
+        }
+        catch (ErrorResponseException e) {
+            return false;
+        }
+        catch (IOException | InvalidKeyException | NoSuchAlgorithmException |
+               ServerException | InsufficientDataException | InvalidResponseException |
+               XmlParserException | InternalException e) {
+            throw new StorageException("Error checking if certain object exists", e);
         }
     }
 }

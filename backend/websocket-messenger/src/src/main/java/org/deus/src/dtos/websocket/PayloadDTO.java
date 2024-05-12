@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.deus.src.dtos.JsonSerializer;
+import org.deus.src.dtos.additional.JsonSerializer;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

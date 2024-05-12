@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,7 +22,7 @@ public class ConvertAvatarService {
     private final StorageAvatarService storageAvatarService;
     private static final Logger logger = LoggerFactory.getLogger(ConvertAvatarService.class);
 
-    public void convertAvatar(long userId) throws DataIsNotPresentException, DataProcessingException {
+    public void convertAvatar(long userId, int targetWidth, int targetHeight) throws DataIsNotPresentException, DataProcessingException {
         Optional<byte[]> optionalOriginalBytes = storageAvatarService.getOriginalBytes(userId);
 
         if (optionalOriginalBytes.isEmpty()) {
@@ -31,13 +32,20 @@ public class ConvertAvatarService {
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(optionalOriginalBytes.get()));
+            BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(optionalOriginalBytes.get()));
 
-            if (image == null) {
+            if (originalImage == null) {
                 throw new IOException("Failed to read image");
             }
 
-            boolean success = ImageIO.write(image, "webp", outputStream);
+            Image scaledImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+            BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g2d = resizedImage.createGraphics();
+            g2d.drawImage(scaledImage, 0, 0, null);
+            g2d.dispose();
+
+            boolean success = ImageIO.write(resizedImage, "webp", outputStream);
 
             if (!success) {
                 throw new IOException("Failed to convert image to WebP format");

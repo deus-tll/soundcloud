@@ -33,7 +33,10 @@ public class ConvertAvatarRabbitMQListener {
         UserDTO userDTO = optionalUserDTO.get();
 
         try {
-            this.convertAvatarService.convertAvatar(userDTO.getId());
+            int targetWidth = 300;
+            int targetHeight = 300;
+
+            this.convertAvatarService.convertAvatar(userDTO.getId(), targetWidth, targetHeight);
 
             this.rabbitMQService.sendWebsocketMessageDTO(
                     "websocket.message.send",
