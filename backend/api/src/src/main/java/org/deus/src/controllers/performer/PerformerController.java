@@ -6,12 +6,11 @@ import org.deus.src.dtos.fromModels.PerformerDTO;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.requests.performer.PerformerCreateRequest;
 import org.deus.src.requests.performer.PerformerUpdateRequest;
-import org.deus.src.services.PerformerService;
+import org.deus.src.services.forModels.PerformerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

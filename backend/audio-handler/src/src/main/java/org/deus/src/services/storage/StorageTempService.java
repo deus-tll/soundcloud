@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.deus.src.drivers.StorageDriverInterface;
 import org.deus.src.exceptions.StorageException;
 import org.deus.src.exceptions.data.DataProcessingException;
+import org.deus.src.exceptions.data.DataRetrievingException;
 import org.deus.src.exceptions.data.DataSavingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

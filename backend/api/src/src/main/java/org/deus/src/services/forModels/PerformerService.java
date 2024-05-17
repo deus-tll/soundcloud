@@ -1,4 +1,4 @@
-package org.deus.src.services;
+package org.deus.src.services.forModels;
 
 import lombok.RequiredArgsConstructor;
 import org.deus.src.dtos.fromModels.PerformerDTO;

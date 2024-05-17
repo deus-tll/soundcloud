@@ -1,6 +1,6 @@
 package org.deus.src.services;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.deus.src.exceptions.data.DataIsNotPresentException;
 import org.deus.src.exceptions.data.DataProcessingException;
 import org.deus.src.exceptions.data.DataSavingException;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ConvertAvatarService {
     private final StorageAvatarService storageAvatarService;
     private static final Logger logger = LoggerFactory.getLogger(ConvertAvatarService.class);

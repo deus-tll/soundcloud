@@ -1,4 +1,4 @@
-package org.deus.src.services;
+package org.deus.src.services.storage;
 
 import lombok.AllArgsConstructor;
 import org.deus.src.drivers.StorageDriverInterface;
@@ -20,6 +20,7 @@ public class StorageAvatarService {
     private final StorageDriverInterface storage;
     private final String bucketName = "avatars";
     private static final Logger logger = LoggerFactory.getLogger(StorageAvatarService.class);
+
 
     private String buildPathToOriginalBytes(long userId) {
         return "/" + userId + "/originalBytes";

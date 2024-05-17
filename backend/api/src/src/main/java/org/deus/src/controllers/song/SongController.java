@@ -6,7 +6,7 @@ import org.deus.src.dtos.fromModels.SongDTO;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.requests.song.SongCreateRequest;
 import org.deus.src.requests.song.SongUpdateRequest;
-import org.deus.src.services.SongService;
+import org.deus.src.services.forModels.SongService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

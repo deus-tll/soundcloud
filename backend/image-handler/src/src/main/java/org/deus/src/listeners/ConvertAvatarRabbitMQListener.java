@@ -1,6 +1,7 @@
 package org.deus.src.listeners;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.deus.src.dtos.fromModels.UserDTO;
 import org.deus.src.exceptions.data.DataIsNotPresentException;
 import org.deus.src.exceptions.data.DataProcessingException;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Optional;
 
 @Configuration
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ConvertAvatarRabbitMQListener {
     private final RabbitMQService rabbitMQService;
     private final ConvertAvatarService convertAvatarService;
@@ -26,7 +27,7 @@ public class ConvertAvatarRabbitMQListener {
         Optional<UserDTO> optionalUserDTO = this.rabbitMQService.receiveUserDTO(message);
 
         if (optionalUserDTO.isEmpty()) {
-            logger.error("UserId was not present when trying to convert avatar");
+            logger.error(UserDTO.class.getName() + " was not present when trying to convert avatar");
             return;
         }
 

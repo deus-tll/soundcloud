@@ -1,8 +1,10 @@
-package org.deus.src.services;
+package org.deus.src.services.forModels;
 
 import lombok.RequiredArgsConstructor;
+import org.deus.src.dtos.creatings.SongCreatingDTO;
 import org.deus.src.dtos.fromModels.SongDTO;
 import org.deus.src.exceptions.StatusException;
+import org.deus.src.exceptions.message.MessageSendingException;
 import org.deus.src.models.PerformerModel;
 import org.deus.src.models.SongModel;
 import org.deus.src.models.auth.UserModel;
@@ -10,7 +12,9 @@ import org.deus.src.repositories.PerformerRepository;
 import org.deus.src.repositories.SongRepository;
 import org.deus.src.requests.song.SongCreateRequest;
 import org.deus.src.requests.song.SongUpdateRequest;
+import org.deus.src.services.RabbitMQService;
 import org.deus.src.services.auth.UserService;
+import org.deus.src.services.storage.StorageSongService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,8 @@ public class SongService {
     private final PerformerRepository performerRepository;
     private final RabbitMQService rabbitMQService;
     private final UserService userService;
+    private final StorageSongService storageSongService;
+    private final String songFileType = ".aac";
 
     @CacheEvict(value = "songs", allEntries = true)
     public SongDTO create(SongCreateRequest request) throws StatusException {
@@ -41,19 +47,35 @@ public class SongService {
             throw new StatusException("At least one performer is required", HttpStatus.BAD_REQUEST);
         }
 
-
-        // process audio file here
-        //
-        // this.rabbitMQService.sendSongCreateDTO("convert.song", request.getFileId(), uploader.getId());
-        //////
-
         SongModel song = new SongModel();
         song.setName(request.getName());
+        song.setName(request.getFileId());
         song.setUploader(uploader);
         song.setPerformers(performers);
 
-        SongModel savedSong = songRepository.save(song);
-        return savedSong.mapToSongDTO();
+        SongModel savedSong = null;
+
+        try {
+            savedSong = songRepository.save(song);
+        }
+        catch (Exception e) {
+            throw new StatusException("Couldn't create object of song in database", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        SongCreatingDTO songCreatingDTO = new SongCreatingDTO(uploader.getId(), savedSong.getId(), request.getFileId(), uploader.getUsername());
+
+        try {
+            this.rabbitMQService.sendSongCreatingDTO("convert.song", songCreatingDTO);
+        } catch (MessageSendingException e) {
+            this.rabbitMQService.sendWebsocketMessageDTO(
+                    "websocket.message.send",
+                    uploader.getUsername(),
+                    "/topic/error",
+                    "Some error occurred while sending your song for preparation",
+                    null);
+        }
+
+        return savedSong.mapToSongDTO(null);
     }
 
     @CacheEvict(value = "songs", allEntries = true)
@@ -73,19 +95,19 @@ public class SongService {
         }
 
         SongModel updatedSong = songRepository.save(song);
-        return updatedSong.mapToSongDTO();
+        return updatedSong.mapToSongDTO(storageSongService.getPathToSong(updatedSong.getId(), songFileType));
     }
 
     @Cacheable(value = "performers", key = "#id")
     public SongDTO getById(Long id) throws StatusException {
         Optional<SongModel> optionalSongModel = songRepository.findById(id);
-        return optionalSongModel.map(SongModel::mapToSongDTO).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
+        return optionalSongModel.map(songModel -> songModel.mapToSongDTO(storageSongService.getPathToSong(songModel.getId(), songFileType))).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
     }
 
-    @Cacheable(value = "performers", key = "#pageable.pageNumber")
+    @Cacheable(value = "performers", key = "#pageable")
     public Page<SongDTO> getAll(Pageable pageable) {
         Page<SongModel> songs = songRepository.findAll(pageable);
-        return songs.map(SongModel::mapToSongDTO);
+        return songs.map(songModel -> songModel.mapToSongDTO(storageSongService.getPathToSong(songModel.getId(), songFileType)));
     }
 
     @CacheEvict(value = "songs", allEntries = true)
