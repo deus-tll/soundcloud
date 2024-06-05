@@ -20,17 +20,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AvatarService {
     private final StorageAvatarService storageAvatarService;
-    private final UserService userService;
     private final RabbitMQService rabbitMQService;
     private static final Logger logger = LoggerFactory.getLogger(AvatarService.class);
 
-    public ResponseEntity<String> avatarUpload(MultipartFile avatar) throws StatusException {
+    public ResponseEntity<String> avatarUpload(MultipartFile avatar, UserModel user) throws StatusException {
         try {
-            UserModel user = userService.getCurrentUser();
-
             storageAvatarService.putOriginalBytes(user.getId(), avatar.getBytes());
 
-            rabbitMQService.sendUserDTO("convert.avatar", user.mapUserToDTO());
+            rabbitMQService.sendUserDTO("convert.avatar", user.mapUserToDTO((String) null));
 
             return new ResponseEntity<>("Process of updating avatar has started. Please wait...", HttpStatus.OK);
         }
@@ -39,5 +36,9 @@ public class AvatarService {
             logger.error(message, e);
             throw new StatusException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public String getAvatarUrl(Long userId) {
+        return storageAvatarService.getPathToAvatar(userId);
     }
 }

@@ -43,12 +43,11 @@ public class SongModel extends BaseEntity {
         return new SongDTO(
                 this.getId(),
                 this.getName(),
-                this.getUploader().mapUserToDTO(),
+                this.getUploader().mapUserToDTO((String) null),
                 this.getPerformers().stream()
                         .map(performerModel -> new PerformerDTO(
                                 performerModel.getId(),
-                                performerModel.getName(),
-                                UserModel.mapUserToDTO(performerModel.getUser())))
+                                performerModel.getName()))
                         .collect(Collectors.toSet()),
                 this.getStatus(),
                 url

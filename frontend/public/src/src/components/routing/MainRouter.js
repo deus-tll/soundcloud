@@ -5,7 +5,6 @@ import RootLayout from "./RootLayout";
 import Home from "../../pages/Home";
 import RequireAuth from "./RequireAuth";
 import Welcome from "../../pages/Welcome";
-import VerifyEmail from "../../pages/auth/VerifyEmail";
 
 const MainRouter = () => {
   return (
@@ -15,9 +14,9 @@ const MainRouter = () => {
       <Route path="register" element={<Register/>}/>
 
       {/* protected routes to individual pages */}
-      <Route element={<RequireAuth/>}>
-        <Route path="verify-email" element={<VerifyEmail/>}/>
-      </Route>
+
+      {/**/}
+
 
       <Route path="/" element={<RootLayout/>}>
         {/* public routes inside RootLayout */}

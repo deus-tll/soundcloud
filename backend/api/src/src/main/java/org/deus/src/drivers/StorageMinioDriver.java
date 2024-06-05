@@ -13,13 +13,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class StorageMinioDriver implements StorageDriverInterface{
     private final MinioClient minioClient;
     private final Set<String> existingBuckets;
+    private final String baseUrl;
 
-    public StorageMinioDriver(MinioClient minioClient) {
+    public StorageMinioDriver(MinioClient minioClient, String baseUrl) {
         this.minioClient = minioClient;
         this.existingBuckets = cacheExistingBuckets();
+        this.baseUrl = baseUrl;
     }
 
     private Set<String> cacheExistingBuckets() {
@@ -38,12 +41,41 @@ public class StorageMinioDriver implements StorageDriverInterface{
         if (!existingBuckets.contains(bucketName)) {
             try {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+                setBucketPolicyPublic(bucketName);
                 existingBuckets.add(bucketName);
             } catch (Exception e) {
                 throw new RuntimeException("Error creating bucket: " + bucketName, e);
             }
         } else {
             System.out.println("Bucket '" + bucketName + "' already exists.");
+        }
+    }
+
+    private void setBucketPolicyPublic(String bucketName) {
+        String policyJson = String.format("""
+                {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": "*",
+                      "Action": [
+                        "s3:GetObject"
+                      ],
+                      "Resource": [
+                        "arn:aws:s3:::%s/*"
+                      ]
+                    }
+                  ]
+                }""", bucketName);
+
+        try {
+            minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
+                    .bucket(bucketName)
+                    .config(policyJson)
+                    .build());
+        } catch (Exception e) {
+            throw new RuntimeException("Error setting bucket policy to public: " + bucketName, e);
         }
     }
 
@@ -106,5 +138,9 @@ public class StorageMinioDriver implements StorageDriverInterface{
                XmlParserException | InternalException e) {
             throw new StorageException("Error checking if certain object exists", e);
         }
+    }
+
+    public String getPublicUrl(String bucketName, String path) {
+        return String.format("%s/%s/%s", baseUrl, bucketName, path);
     }
 }

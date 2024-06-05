@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SongCreatingDTO {
+    private Long userId;
     private Long songId;
     private String fileId;
     private String uploaderUsername;

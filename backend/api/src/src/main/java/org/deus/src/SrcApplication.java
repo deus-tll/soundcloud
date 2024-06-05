@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 @SpringBootApplication
 @EnableScheduling
 public class SrcApplication {
+	private static final Logger logger = LoggerFactory.getLogger(SrcApplication.class);
 	public static void main(String[] args) {
 		SpringApplication.run(SrcApplication.class, args);
 	}

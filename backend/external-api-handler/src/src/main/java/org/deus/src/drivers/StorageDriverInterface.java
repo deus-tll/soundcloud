@@ -11,4 +11,6 @@ public interface StorageDriverInterface {
 
     public boolean isFileExists(String bucketName, String path)
             throws StorageException;
+
+    public String getPublicUrl(String bucketName, String path);
 }

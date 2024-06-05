@@ -3,6 +3,8 @@ package org.deus.src.controllers.upload;
 import lombok.RequiredArgsConstructor;
 import org.deus.src.exceptions.StatusException;
 import org.deus.src.services.UploadService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping("/api/upload")
 public class UploadController {
     private final UploadService uploadService;
+    private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
     @RequestMapping(
             value = "/file",
@@ -30,7 +33,9 @@ public class UploadController {
                     RequestMethod.GET
             })
     public void upload(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
+        logger.info("UPLOAD!!!! - PacketUpload Start");
         this.uploadService.processUpload(servletRequest, servletResponse);
+        logger.info("UPLOAD!!!! - PacketUpload Finish");
     }
 
     @PostMapping("/request")

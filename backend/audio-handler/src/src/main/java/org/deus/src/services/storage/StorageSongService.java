@@ -16,12 +16,12 @@ public class StorageSongService {
     private final String bucketName = "songs";
 
     private String buildPath(long songId, String type) {
-        return "/" + songId + "/song" + type;
+        return songId + "/song" + type;
     }
 
     public void putConvertedBytes(long songId, byte[] convertedBytes, String type) throws DataSavingException {
         try {
-            this.storage.put(bucketName, buildPath(songId, type), convertedBytes);
+            this.storage.put(bucketName, "/" + buildPath(songId, type), convertedBytes);
         } catch (StorageException e) {
             String errorMessage = "Error while putting converted bytes of file with type \"" + type + "\" to store, bucket/container: \"" + bucketName + "\"";
             logger.error(errorMessage, e);
@@ -30,6 +30,6 @@ public class StorageSongService {
     }
 
     public String getPathToSong(long songId, String type) {
-        return buildPath(songId, type);
+        return storage.getPublicUrl(bucketName, buildPath(songId, type));
     }
 }

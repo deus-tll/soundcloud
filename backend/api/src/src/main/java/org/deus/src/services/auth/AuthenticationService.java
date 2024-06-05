@@ -9,6 +9,7 @@ import org.deus.src.requests.auth.SignInRequest;
 import org.deus.src.requests.auth.SignUpRequest;
 import org.deus.src.responses.auth.JwtAuthenticationResponse;
 
+import org.deus.src.services.AvatarService;
 import org.deus.src.services.RabbitMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final UserService userService;
+    private final AvatarService avatarService;
     private final JwtService jwtService;
     private final RabbitMQService rabbitMQService;
     private final PasswordEncoder passwordEncoder;
@@ -33,6 +35,11 @@ public class AuthenticationService {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     public JwtAuthenticationResponse signUp(SignUpRequest request) throws StatusException {
+
+        if (!request.getPassword().equals(request.getPasswordConfirmation())) {
+            throw new StatusException("Confirmation password isn't matching", HttpStatus.BAD_REQUEST);
+        }
+
         UserModel user = UserModel.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -42,7 +49,9 @@ public class AuthenticationService {
 
         userService.create(user);
 
-        UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        Long userId = user.getId();
+
+        UserDTO userDTO = new UserDTO(userId, user.getUsername(), user.getEmail(), user.getRole(), avatarService.getAvatarUrl(userId));
 
         String jwt = jwtService.generateToken(user);
 
@@ -64,14 +73,16 @@ public class AuthenticationService {
         try {
             authenticationManager.authenticate(authenticationToken);
         } catch (AuthenticationException e) {
-            throw new StatusException(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            throw new StatusException(e.getMessage() + ", try again or if you don't have account yet, create one.", HttpStatus.UNAUTHORIZED);
         }
 
         UserModel user = userService.getByUsername(request.getUsername());
 
         var jwt = jwtService.generateToken(user);
 
-        UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        Long userId = user.getId();
+
+        UserDTO userDTO = new UserDTO(userId, user.getUsername(), user.getEmail(), user.getRole(), avatarService.getAvatarUrl(userId));
 
         return new JwtAuthenticationResponse(jwt, userDTO);
     }

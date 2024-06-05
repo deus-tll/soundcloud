@@ -113,6 +113,13 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.25.55</version>
+		</dependency>
+
+
 <!--		<dependency>-->
 <!--			<groupId>com.graphql-java-kickstart</groupId>-->
 <!--			<artifactId>graphql-spring-boot-starter</artifactId>-->

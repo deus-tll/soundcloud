@@ -1,15 +1,17 @@
 package org.deus.src.dtos.errors;
 
 import lombok.Data;
+import org.deus.src.exceptions.StatusException;
+import org.springframework.http.HttpStatus;
 
 @Data
 public class ErrorResponseDTO {
 
-    private final String status;
+    private final HttpStatus status;
     private final String message;
 
-    public ErrorResponseDTO(Exception ex) {
-        this.status = ex.getClass().toString();
+    public ErrorResponseDTO(StatusException ex) {
+        this.status = ex.getStatus();
         this.message = ex.getMessage();
     }
 }

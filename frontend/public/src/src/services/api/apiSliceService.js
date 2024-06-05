@@ -16,10 +16,8 @@ const baseQuery = fetchBaseQuery({
 });
 
 const baseQueryWithReAuth = async (args, api, extraOptions) => {
-  let result = await baseQuery(args, api, extraOptions);
-
+  //let result = await baseQuery(args, api, extraOptions);
   // for the future option to add refresh token
-
   // if (result?.error?.status === 403) {
   //   console.log('sending refresh token');
   //
@@ -40,7 +38,7 @@ const baseQueryWithReAuth = async (args, api, extraOptions) => {
   //   }
   // }
 
-  return result;
+  return baseQuery(args, api, extraOptions);
 };
 
 export const apiSliceService = createApi({

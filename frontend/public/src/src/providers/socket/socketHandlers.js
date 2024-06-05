@@ -1,5 +1,5 @@
-import {updateUserFields} from "../../services/auth/authSliceService";
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 //// Default Events
 ////////////////////////
@@ -19,27 +19,10 @@ export const handlePing = (data) => {
   console.log('Ping from server:', data);
 };
 
-
-//// Avatars Stored Event
-////////////////////////
-let avatarsStoredCallback;
-
-export const setAvatarsStoredCallback = (callback) => {
-  avatarsStoredCallback = callback;
+export const avatarIsReady = (data) => {
+  console.log('Avatar is ready:', data);
+  toast.success(`Avatar is ready! Message: ${data.message}`, {
+    position: "top-right",
+    autoClose: 3000
+  });
 };
-
-export const handleAvatarsStored = (socketConnection, dispatch, data, eventName) => {
-  const avatars = JSON.parse(data);
-  console.log('Received avatars:', avatars);
-
-  const fieldsToUpdate = {
-    avatars
-  };
-
-  dispatch(updateUserFields({fieldsToUpdate}));
-
-  if (avatarsStoredCallback) {
-    socketConnection.off(eventName, avatarsStoredCallback);
-  }
-};
-////////////////////////

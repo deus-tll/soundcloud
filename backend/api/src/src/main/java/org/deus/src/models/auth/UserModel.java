@@ -51,7 +51,7 @@ public class UserModel  extends BaseEntity implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(name = "role", length = 15, nullable = false)
     private RoleEnum role;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -68,14 +68,14 @@ public class UserModel  extends BaseEntity implements UserDetails {
         UserDTO userDTO = null;
 
         if (userModel != null) {
-            userDTO = userModel.mapUserToDTO();
+            userDTO = userModel.mapUserToDTO((String) null);
         }
 
         return userDTO;
     }
 
-    public UserDTO mapUserToDTO() {
-        return new UserDTO(this.getId(), this.getUsername(), this.getEmail(), this.getRole());
+    public UserDTO mapUserToDTO(String avatarUrl) {
+        return new UserDTO(this.getId(), this.getUsername(), this.getEmail(), this.getRole(), avatarUrl);
     }
 
     @Override

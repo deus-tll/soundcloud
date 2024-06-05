@@ -30,6 +30,11 @@ public class SignUpRequest {
 
     @Schema(description = "Password", example = "my_1secret1_password")
     @Size(min = 5, max = 60, message = "The password must contain between 5 and 60 characters")
-    @NotBlank(message = "The password address cannot be empty")
+    @NotBlank(message = "The password cannot be empty")
     private String password;
+
+    @Schema(description = "Password confirmation", example = "my_1secret1_password")
+    @Size(min = 5, max = 60, message = "Should be the same as password")
+    @NotBlank(message = "The password confirmation cannot be empty")
+    private String passwordConfirmation;
 }

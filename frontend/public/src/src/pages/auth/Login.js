@@ -13,11 +13,11 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const emailRef = useRef();
+  const usernameRef = useRef();
   const errorRef = useRef();
 
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   const [rememberMe, setRememberMe] = useState(false);
@@ -26,12 +26,12 @@ const Login = () => {
   const [login, { isLoading }] = useLoginMutation();
 
   useEffect(() => {
-    emailRef?.current?.focus();
+    usernameRef?.current?.focus();
   }, []);
 
   useEffect(() => {
     setErrors({});
-  }, [formData.email, formData.password]);
+  }, [formData.username, formData.password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,29 +41,30 @@ const Login = () => {
     if (form.checkValidity()) {
       try {
         const result = await login(formData).unwrap();
-        const access_token = result.data.authorization.access_token;
-        const user = result.data.user;
 
-        user.avatars = result.data.avatars;
+        const accessToken = result.token;
+        const user = result.user;
 
-        dispatch(setCredentials({ user, accessToken: access_token, rememberMe }));
+        dispatch(setCredentials({ user, accessToken: accessToken, rememberMe }));
 
         navigate('/welcome');
       }
       catch (errorData) {
-        if (errorData.originalStatus) {
-          setErrors({general: errorData.error});
-        } else if(errorData.status === 422) {
-          setErrors(errorData.data.errors);
-        } else if (errorData.status === 401 || errorData.status === 500) {
-          let status = errorData?.data?.data?.status;
-          let message = errorData?.data?.data?.message;
-          let error = errorData?.data?.data?.error;
+        if(errorData.status) {
+          let status = errorData?.data?.status;
+          let message = errorData?.data?.message;
+          let errorMessage;
 
-          let errorMessage = `${status ? status : ''}: ${message ? message : ''}. ${error ? error : ''}`;
+          if(errorData.data) {
+            errorMessage = `${status ? status : ''}: ${message ? message : ''}.`;
+          }
+          else {
+            errorMessage = "Something went wrong. Try later"
+          }
 
           setErrors({ general: errorMessage });
-        } else {
+        }
+        else {
           setErrors({ general: 'Login Failed' });
         }
 
@@ -94,17 +95,17 @@ const Login = () => {
             <Form onSubmit={handleSubmit}>
               <h3>Sign In</h3>
 
-              <Form.Group className="mb-3" controlId="email">
-                <Form.Label>Email address</Form.Label>
+              <Form.Group className="mb-3" controlId="username">
+                <Form.Label>Username</Form.Label>
 
                 <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  ref={emailRef}
-                  value={formData.email}
+                  type="text"
+                  placeholder="Enter username"
+                  ref={usernameRef}
+                  value={formData.username}
                   onChange={handleChange}
-                  name="email"
-                  isInvalid={errors.hasOwnProperty('email')}
+                  name="username"
+                  isInvalid={errors.hasOwnProperty('username')}
                   onKeyDown={async (e) => {
                     if (e.key === 'Enter') {
                       await handleSubmit(e);
@@ -113,7 +114,7 @@ const Login = () => {
                   required/>
 
                 <Form.Control.Feedback type="invalid">
-                  {errors && errors.hasOwnProperty('email') && errors.email[0]}
+                  {errors && errors.hasOwnProperty('username') && errors.username[0]}
                 </Form.Control.Feedback>
               </Form.Group>
 
@@ -170,7 +171,7 @@ const Login = () => {
               </div>
             </Form>
 
-            {errors && errors.hasOwnProperty('general') && <Alert variant="danger">{errors.general}</Alert>}
+            {errors && errors.hasOwnProperty('general') && <Alert variant="danger" className="mt-3 mb-0">{errors.general}</Alert>}
           </div>
         )}
       </section>

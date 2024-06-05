@@ -2,6 +2,7 @@ package org.deus.src.requests.performer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PerformerCreateRequest {
     @Schema(description = "Flag indicating whether the current user that made request is performer he creates")
-    @NotBlank(message = "The isUser flag cannot be empty")
+    @NotNull(message = "The isUser flag cannot be empty")
     private boolean isUser;
 
     @Schema(description = "Performer's name", example = "John Doe")

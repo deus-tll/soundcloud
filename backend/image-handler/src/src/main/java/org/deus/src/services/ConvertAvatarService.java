@@ -8,12 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Optional;
 
 @Service
@@ -45,11 +50,23 @@ public class ConvertAvatarService {
             g2d.drawImage(scaledImage, 0, 0, null);
             g2d.dispose();
 
-            boolean success = ImageIO.write(resizedImage, "webp", outputStream);
-
-            if (!success) {
-                throw new IOException("Failed to convert image to WebP format");
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType("image/webp");
+            if (!writers.hasNext()) {
+                throw new IOException("No WebP writer found");
             }
+
+            ImageWriter writer = writers.next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
+                writer.setOutput(ios);
+                writer.write(null, new IIOImage(resizedImage, null, null), param);
+            }
+
+//            boolean success = ImageIO.write(resizedImage, "webp", outputStream);
+//
+//            if (!success) {
+//                throw new IOException("Failed to convert image to WebP format");
+//            }
 
             byte[] webpData = outputStream.toByteArray();
 

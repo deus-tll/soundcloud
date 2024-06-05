@@ -1,6 +1,6 @@
 package org.deus.src.services.storage;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.deus.src.drivers.StorageDriverInterface;
 import org.deus.src.exceptions.StorageException;
 import org.deus.src.exceptions.data.DataSavingException;
@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StorageAvatarService {
     private final StorageDriverInterface storage;
     private final String bucketName = "avatars";
@@ -24,6 +24,9 @@ public class StorageAvatarService {
 
     private String buildPathToOriginalBytes(long userId) {
         return "/" + userId + "/originalBytes";
+    }
+    private String buildPathToAvatar(long userId) {
+        return userId + "/avatar.webp";
     }
 
     public void putOriginalBytes(long userId, byte[] bytes) throws DataSavingException {
@@ -39,7 +42,7 @@ public class StorageAvatarService {
 
     public void putWebP(long userId, byte[] bytes) throws DataSavingException {
         try {
-            storage.put(bucketName,  "/" + userId + "/avatar.webp", bytes);
+            storage.put(bucketName, "/" + buildPathToAvatar(userId), bytes);
         }
         catch (StorageException e) {
             String errorMessage = "Error while putting WebP bytes to store, bucket/container: \"" + bucketName + "\"";
@@ -81,5 +84,9 @@ public class StorageAvatarService {
         try (InputStream inputStream = url.openStream()) {
             return inputStream.readAllBytes();
         }
+    }
+
+    public String getPathToAvatar(long userId) {
+        return storage.getPublicUrl(bucketName, buildPathToAvatar(userId));
     }
 }

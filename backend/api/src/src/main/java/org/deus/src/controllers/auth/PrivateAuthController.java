@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/private/auth")
+@RequestMapping("/private-api/auth")
 @RequiredArgsConstructor
 public class PrivateAuthController {
     private final AuthenticationService authenticationService;

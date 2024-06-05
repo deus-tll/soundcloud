@@ -1,9 +1,7 @@
-function App() {
-  return (
-    <div className="App">
+import MainRouter from "./components/routing/MainRouter";
 
-    </div>
-  );
+function App() {
+  return <MainRouter/>;
 }
 
 export default App;

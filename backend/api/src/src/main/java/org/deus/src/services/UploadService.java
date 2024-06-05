@@ -47,6 +47,7 @@ public class UploadService {
         Map<String, String> metadata = uploadInfo.getMetadata();
 
         if (uploadInfo.isUploadInProgress()) {
+            logger.info("UPLOAD!!!! - Upload Is In Progress. To the next packet!");
             return;
         }
 
@@ -82,6 +83,8 @@ public class UploadService {
             catch (IOException | DataNotFoundException | DataProcessingException e) {
                 logger.error("Error during storing file upload with URI \"" + uploadURI + "\", for user with id \"" + user.getId() + "\" and metadata: [" + metadata.toString() + "]", e);
             }
+
+            logger.info("UPLOAD!!!! - Upload Finished!");
         });
     }
 

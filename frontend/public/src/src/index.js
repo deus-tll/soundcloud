@@ -12,11 +12,13 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import App from './App';
+import {ToastContainer} from "react-toastify";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+      <ToastContainer />
       <Provider store={store}>
           <AuthProvider>
               <SocketProvider>

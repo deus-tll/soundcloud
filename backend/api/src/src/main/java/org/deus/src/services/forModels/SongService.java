@@ -11,6 +11,7 @@ import org.deus.src.models.auth.UserModel;
 import org.deus.src.repositories.PerformerRepository;
 import org.deus.src.repositories.SongRepository;
 import org.deus.src.requests.song.SongCreateRequest;
+import org.deus.src.requests.song.SongStatusRequest;
 import org.deus.src.requests.song.SongUpdateRequest;
 import org.deus.src.services.RabbitMQService;
 import org.deus.src.services.auth.UserService;
@@ -36,7 +37,6 @@ public class SongService {
     private final RabbitMQService rabbitMQService;
     private final UserService userService;
     private final StorageSongService storageSongService;
-    private final String songFileType = ".aac";
 
     @CacheEvict(value = "songs", allEntries = true)
     public SongDTO create(SongCreateRequest request) throws StatusException {
@@ -75,7 +75,7 @@ public class SongService {
                     null);
         }
 
-        return savedSong.mapToSongDTO(null);
+        return savedSong.mapToSongDTO(this.getSongUrl(savedSong.getId()));
     }
 
     @CacheEvict(value = "songs", allEntries = true)
@@ -95,19 +95,19 @@ public class SongService {
         }
 
         SongModel updatedSong = songRepository.save(song);
-        return updatedSong.mapToSongDTO(storageSongService.getPathToSong(updatedSong.getId(), songFileType));
+        return updatedSong.mapToSongDTO(this.getSongUrl(updatedSong.getId()));
     }
 
     @Cacheable(value = "performers", key = "#id")
     public SongDTO getById(Long id) throws StatusException {
         Optional<SongModel> optionalSongModel = songRepository.findById(id);
-        return optionalSongModel.map(songModel -> songModel.mapToSongDTO(storageSongService.getPathToSong(songModel.getId(), songFileType))).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
+        return optionalSongModel.map(songModel -> songModel.mapToSongDTO(this.getSongUrl(songModel.getId()))).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
     }
 
     @Cacheable(value = "performers", key = "#pageable")
     public Page<SongDTO> getAll(Pageable pageable) {
         Page<SongModel> songs = songRepository.findAll(pageable);
-        return songs.map(songModel -> songModel.mapToSongDTO(storageSongService.getPathToSong(songModel.getId(), songFileType)));
+        return songs.map(songModel -> songModel.mapToSongDTO(this.getSongUrl(songModel.getId())));
     }
 
     @CacheEvict(value = "songs", allEntries = true)
@@ -117,6 +117,14 @@ public class SongService {
         }
 
         songRepository.deleteById(id);
+    }
+
+    public void updateStatus(Long id, SongStatusRequest request) throws StatusException {
+        SongModel song = songRepository.findById(id)
+                .orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
+
+        song.setStatus(request.getStatus());
+        songRepository.save(song);
     }
 
     private Set<PerformerModel> getPerformersFromIds(Set<Long> performerIds) {
@@ -129,5 +137,10 @@ public class SongService {
         }
 
         return performers;
+    }
+
+    private String getSongUrl(Long songId) {
+        String songFileType = ".aac";
+        return storageSongService.getPathToSong(songId, songFileType);
     }
 }

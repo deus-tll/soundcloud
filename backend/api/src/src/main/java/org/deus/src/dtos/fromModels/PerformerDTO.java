@@ -11,5 +11,4 @@ import java.util.Set;
 public class PerformerDTO {
     private Long id;
     private String name;
-    private UserDTO user;
 }

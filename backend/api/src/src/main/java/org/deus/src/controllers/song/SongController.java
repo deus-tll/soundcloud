@@ -10,6 +10,7 @@ import org.deus.src.services.forModels.SongService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +22,13 @@ import org.springframework.web.bind.annotation.*;
 public class SongController {
     private final SongService songService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SongDTO> createSong(@RequestBody @Valid SongCreateRequest request) throws StatusException {
         SongDTO songDTO = this.songService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(songDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SongDTO> updateSong(@PathVariable Long id, @RequestBody @Valid SongUpdateRequest request) throws StatusException {
         SongDTO songDTO = this.songService.update(id, request);
         return ResponseEntity.ok(songDTO);

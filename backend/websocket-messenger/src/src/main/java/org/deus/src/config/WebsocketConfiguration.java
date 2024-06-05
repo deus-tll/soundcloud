@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -22,6 +23,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -38,7 +41,7 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     public WebsocketConfiguration() {
         this.restTemplate = new RestTemplate();
-        this.authServiceUrl = "http://soundcloud.api/private/auth/validate-token";
+        this.authServiceUrl = "http://soundcloud.api/private-api/auth/validate-token";
     }
 
     @Override
@@ -67,8 +70,6 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
                     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                         System.out.println("authorizationHeader: " + authorizationHeader);
-
-                        String token = authorizationHeader.substring(7);
 
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_JSON);

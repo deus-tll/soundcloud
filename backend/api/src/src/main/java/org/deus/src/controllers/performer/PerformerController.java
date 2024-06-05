@@ -10,6 +10,7 @@ import org.deus.src.services.forModels.PerformerService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,13 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class PerformerController {
     private final PerformerService performerService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PerformerDTO> createPerformer(@RequestBody @Valid PerformerCreateRequest request) {
         PerformerDTO performerDTO = this.performerService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(performerDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PerformerDTO> updatePerformer(@PathVariable Long id, @RequestBody @Valid PerformerUpdateRequest request) throws StatusException {
         PerformerDTO updatedPerformer = this.performerService.update(id, request);
         return ResponseEntity.ok(updatedPerformer);

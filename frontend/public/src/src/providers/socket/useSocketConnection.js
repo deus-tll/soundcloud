@@ -1,49 +1,78 @@
 import {useState} from "react";
-import {io} from 'socket.io-client';
-import {handleConnect, handleDisconnect, handleMyNameIs, handlePing} from "./socketHandlers";
+import SockJS from 'sockjs-client';
+import {Stomp} from '@stomp/stompjs';
 
-const SOCKET_SERVER_URL = process.env.REACT_APP_SOCKET_SERVER_URL;
+const SOCKET_SERVER_URL = "http://localhost/websocket-private";
 
 const useSocketConnection = () => {
   const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const connect = (token) => {
-    if (!socket && token) {
-      const newSocket = io(SOCKET_SERVER_URL, {
-        auth: {
-          token: token
-        }
-      });
+    try {
+      if(!socket && token) {
+        const sock = new SockJS(SOCKET_SERVER_URL);
+        const stompClient = Stomp.over(sock);
 
-      newSocket.connect();
+        const onConnect = (frame) => {
+          console.log('Connected to WebSocket');
+          console.log('frame: ' + frame);
+          setIsConnected(true);
+        };
 
-      newSocket.on('connect', handleConnect);
-      newSocket.on('disconnect', handleDisconnect);
-      newSocket.on('socket.myNameIs', handleMyNameIs);
-      newSocket.on('ping', handlePing);
+        const onDisconnect = (error) => {
+          console.error('Disconnected from WebSocket:', error);
+          setIsConnected(false);
+        };
 
-      setSocket(newSocket);
+        // const onBeforeConnect = () => {
+        //   stompClient.setHeaders({
+        //     Authorization: `Bearer ${token}`,
+        //   });
+        // };
+
+        stompClient.connect({Authorization: `Bearer ${token}`}, onConnect, onDisconnect);
+
+        console.info("connectHeaders: ", stompClient.connectHeaders);
+
+        setSocket(stompClient);
+      }
+    }
+    catch (error) {
+      console.error('Error connecting to WebSocket:', error);
+      setErrorMessage(error.message);
     }
   };
 
-  const close = () => {
-    socket?.off('connect', handleConnect);
-    socket?.off('disconnect', handleDisconnect);
-    socket?.off('socket.myNameIs', handleMyNameIs);
-    socket?.off('ping', handlePing);
-
-    socket?.close();
+  const disconnect = () => {
+    if (socket) {
+      socket.disconnect();
+      setSocket(null);
+      setIsConnected(false);
+    }
   };
 
-  const on = (eventName, callBack) => {
-    socket?.on(eventName, callBack);
+  const subscribeToTopic = (topic, callback) => {
+    if (socket && isConnected) {
+      return socket.subscribe(topic, callback);
+    }
+    else {
+      console.error('Failed to subscribe to topic: ' + topic);
+      return null;
+    }
   };
 
-  const off = (eventName, callBack) => {
-    socket?.off(eventName, callBack);
+  const unsubscribeFromTopic = (subscription) => {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+    else {
+      console.error('Failed to unsubscribe from topic: ' + subscription.id);
+    }
   };
 
-  return { connect, close, on, off };
+  return { isConnected, errorMessage, connect, disconnect, subscribeToTopic, unsubscribeFromTopic };
 };
 
 export default useSocketConnection;
