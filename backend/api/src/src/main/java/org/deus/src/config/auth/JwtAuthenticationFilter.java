@@ -1,8 +1,12 @@
 package org.deus.src.config.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import lombok.SneakyThrows;
+import org.deus.src.exceptions.StatusException;
 import org.deus.src.services.auth.JwtService;
 import org.deus.src.services.auth.UserService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -46,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwt = authHeader.substring(BEARER_PREFIX.length());
+
         String username = jwtService.extractUserName(jwt);
 
         if(StringUtils.isNoneEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {

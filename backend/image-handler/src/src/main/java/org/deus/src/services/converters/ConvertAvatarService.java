@@ -1,9 +1,11 @@
-package org.deus.src.services;
+package org.deus.src.services.converters;
 
 import lombok.RequiredArgsConstructor;
 import org.deus.src.exceptions.data.DataIsNotPresentException;
 import org.deus.src.exceptions.data.DataProcessingException;
 import org.deus.src.exceptions.data.DataSavingException;
+import org.deus.src.services.ConverterService;
+import org.deus.src.services.storage.StorageAvatarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ConvertAvatarService {
     private final StorageAvatarService storageAvatarService;
+    private final ConverterService converterService;
     private static final Logger logger = LoggerFactory.getLogger(ConvertAvatarService.class);
 
     public void convertAvatar(long userId, int targetWidth, int targetHeight) throws DataIsNotPresentException, DataProcessingException {
@@ -37,40 +40,9 @@ public class ConvertAvatarService {
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(optionalOriginalBytes.get()));
+            byte[] data = converterService.convert(targetWidth, targetHeight, "image/webp", outputStream, optionalOriginalBytes.get());
 
-            if (originalImage == null) {
-                throw new IOException("Failed to read image");
-            }
-
-            Image scaledImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-            BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g2d = resizedImage.createGraphics();
-            g2d.drawImage(scaledImage, 0, 0, null);
-            g2d.dispose();
-
-            Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType("image/webp");
-            if (!writers.hasNext()) {
-                throw new IOException("No WebP writer found");
-            }
-
-            ImageWriter writer = writers.next();
-            ImageWriteParam param = writer.getDefaultWriteParam();
-            try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
-                writer.setOutput(ios);
-                writer.write(null, new IIOImage(resizedImage, null, null), param);
-            }
-
-//            boolean success = ImageIO.write(resizedImage, "webp", outputStream);
-//
-//            if (!success) {
-//                throw new IOException("Failed to convert image to WebP format");
-//            }
-
-            byte[] webpData = outputStream.toByteArray();
-
-            storageAvatarService.putWebP(userId, webpData);
+            storageAvatarService.putNewBytesAsFile(userId, data);
         }
         catch (IOException e) {
             String errorMessage = "Error while converting avatar";

@@ -5,7 +5,6 @@ import org.deus.src.exceptions.StatusException;
 import org.deus.src.exceptions.data.DataSavingException;
 import org.deus.src.exceptions.message.MessageSendingException;
 import org.deus.src.models.auth.UserModel;
-import org.deus.src.services.auth.UserService;
 import org.deus.src.services.storage.StorageAvatarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +38,6 @@ public class AvatarService {
     }
 
     public String getAvatarUrl(Long userId) {
-        return storageAvatarService.getPathToAvatar(userId);
+        return storageAvatarService.getPathToFile(userId);
     }
 }

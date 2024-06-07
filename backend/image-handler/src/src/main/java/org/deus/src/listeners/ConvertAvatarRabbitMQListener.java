@@ -1,11 +1,10 @@
 package org.deus.src.listeners;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.deus.src.dtos.fromModels.UserDTO;
 import org.deus.src.exceptions.data.DataIsNotPresentException;
 import org.deus.src.exceptions.data.DataProcessingException;
-import org.deus.src.services.ConvertAvatarService;
+import org.deus.src.services.converters.ConvertAvatarService;
 import org.deus.src.services.RabbitMQService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

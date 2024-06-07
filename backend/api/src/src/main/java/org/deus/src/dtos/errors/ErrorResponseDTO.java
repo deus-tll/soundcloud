@@ -14,4 +14,9 @@ public class ErrorResponseDTO {
         this.status = ex.getStatus();
         this.message = ex.getMessage();
     }
+
+    public ErrorResponseDTO(HttpStatus status, String Message) {
+        this.status = status;
+        this.message = Message;
+    }
 }

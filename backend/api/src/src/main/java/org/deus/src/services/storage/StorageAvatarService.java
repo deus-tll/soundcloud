@@ -25,7 +25,7 @@ public class StorageAvatarService {
     private String buildPathToOriginalBytes(long userId) {
         return "/" + userId + "/originalBytes";
     }
-    private String buildPathToAvatar(long userId) {
+    private String buildPathToFile(long userId) {
         return userId + "/avatar.webp";
     }
 
@@ -40,12 +40,12 @@ public class StorageAvatarService {
         }
     }
 
-    public void putWebP(long userId, byte[] bytes) throws DataSavingException {
+    public void putNewBytesAsFile(long userId, byte[] bytes) throws DataSavingException {
         try {
-            storage.put(bucketName, "/" + buildPathToAvatar(userId), bytes);
+            storage.put(bucketName, "/" + buildPathToFile(userId), bytes);
         }
         catch (StorageException e) {
-            String errorMessage = "Error while putting WebP bytes to store, bucket/container: \"" + bucketName + "\"";
+            String errorMessage = "Error while putting bytes to store as a file, bucket/container: \"" + bucketName + "\"";
             logger.error(errorMessage, e);
             throw new DataSavingException(errorMessage, e);
         }
@@ -86,7 +86,7 @@ public class StorageAvatarService {
         }
     }
 
-    public String getPathToAvatar(long userId) {
-        return storage.getPublicUrl(bucketName, buildPathToAvatar(userId));
+    public String getPathToFile(long userId) {
+        return storage.getPublicUrl(bucketName, buildPathToFile(userId));
     }
 }

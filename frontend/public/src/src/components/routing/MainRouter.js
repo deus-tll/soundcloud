@@ -5,6 +5,9 @@ import RootLayout from "./RootLayout";
 import Home from "../../pages/Home";
 import RequireAuth from "./RequireAuth";
 import Welcome from "../../pages/Welcome";
+import AddPerformer from "../../pages/performer/AddPerformer";
+import EditPerformer from "../../pages/performer/EditPerformer";
+import Performers from "../../pages/performer/Performers";
 
 const MainRouter = () => {
   return (
@@ -25,6 +28,10 @@ const MainRouter = () => {
         {/* protected routes inside RootLayout */}
         <Route element={<RequireAuth/>}>
           <Route path="welcome" element={<Welcome/>}/>
+
+          <Route path="performers" element={<Performers/>}/>
+          <Route path="performers/add" element={<AddPerformer/>}/>
+          <Route path="performers/edit/:id" element={<EditPerformer/>}/>
         </Route>
       </Route>
     </Routes>

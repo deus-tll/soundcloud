@@ -1,6 +1,9 @@
 package org.deus.src.services.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import org.deus.src.exceptions.StatusException;
 import org.deus.src.models.auth.UserModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,7 +64,7 @@ public class JwtService {
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().claims(extraClaims).subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + 10 * 60 * 24))
                 .signWith(getSigningKey()).compact();
     }
 

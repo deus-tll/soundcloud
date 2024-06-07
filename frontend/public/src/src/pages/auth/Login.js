@@ -4,7 +4,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import {Alert, Button, Form} from 'react-bootstrap';
 
 import {useLoginMutation} from '../../services/auth/authApiSliceService';
-import {setCredentials} from '../../services/auth/authSliceService';
+import {logOut, setCredentials} from '../../services/auth/authSliceService';
 
 import AuthWrapper from '../../components/auth/AuthWrapper';
 
@@ -24,6 +24,10 @@ const Login = () => {
   const [errors, setErrors] = useState({});
 
   const [login, { isLoading }] = useLoginMutation();
+
+  useEffect(() => {
+    dispatch(logOut());
+  }, [dispatch]);
 
   useEffect(() => {
     usernameRef?.current?.focus();
@@ -49,13 +53,13 @@ const Login = () => {
 
         navigate('/welcome');
       }
-      catch (errorData) {
-        if(errorData.status) {
-          let status = errorData?.data?.status;
-          let message = errorData?.data?.message;
+      catch (error) {
+        if(error.status) {
+          let status = error?.data?.status;
+          let message = error?.data?.message;
           let errorMessage;
 
-          if(errorData.data) {
+          if(error.data) {
             errorMessage = `${status ? status : ''}: ${message ? message : ''}.`;
           }
           else {
@@ -65,7 +69,7 @@ const Login = () => {
           setErrors({ general: errorMessage });
         }
         else {
-          setErrors({ general: 'Login Failed' });
+          setErrors({ general: 'Login failed' });
         }
 
         errorRef?.current?.focus();

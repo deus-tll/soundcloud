@@ -9,8 +9,8 @@ const Home = () => {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
-                            <NavLink to="/performers">Performers</NavLink>
-                            <NavLink to="/songs">Songs</NavLink>
+                            <NavLink href="/performers">Performers</NavLink>
+                            <NavLink href="/songs">Songs</NavLink>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>

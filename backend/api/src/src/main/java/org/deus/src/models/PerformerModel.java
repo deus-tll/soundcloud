@@ -37,7 +37,8 @@ public class PerformerModel extends BaseEntity {
     public PerformerDTO mapToPerformerDTO() {
         return new PerformerDTO(
                 this.getId(),
-                this.getName()
+                this.getName(),
+                null
         );
     }
 }

@@ -1,5 +1,6 @@
 package org.deus.src.config.exceptions;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.deus.src.dtos.errors.ErrorResponseDTO;
 import org.deus.src.exceptions.StatusException;
 
@@ -14,6 +15,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleException(StatusException ex) {
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex);
         HttpStatus status = ex.getStatus();
+        return ResponseEntity.status(status.value()).body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponseDTO> handleExpiredJwtException(ExpiredJwtException ex) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(status, ex.getMessage());
         return ResponseEntity.status(status.value()).body(errorResponseDTO);
     }
 }

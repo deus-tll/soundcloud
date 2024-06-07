@@ -4,7 +4,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {Alert, Form, Button} from "react-bootstrap";
 
 import {useRegisterMutation} from "../../services/auth/authApiSliceService";
-import {setCredentials} from "../../services/auth/authSliceService";
+import {logOut, setCredentials} from "../../services/auth/authSliceService";
 
 // import {avatarIsReady} from "../../providers/socket/socketHandlers";
 // import {useSocket} from "../../providers/socket/SocketProvider";
@@ -16,7 +16,7 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const firstNameRef = useRef();
+  const usernameRef = useRef();
   const errorRef = useRef();
 
   //const { socketConnection } = useSocket();
@@ -39,7 +39,11 @@ const Register = () => {
   // }, [socketConnection, dispatch]);
 
   useEffect(() => {
-    firstNameRef?.current?.focus();
+    dispatch(logOut());
+  }, [dispatch]);
+
+  useEffect(() => {
+    usernameRef?.current?.focus();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -58,13 +62,13 @@ const Register = () => {
 
         navigate('/welcome');
       }
-      catch (errorData) {
-        if(errorData.status) {
-          let status = errorData?.data?.status;
-          let message = errorData?.data?.message;
+      catch (error) {
+        if(error.status) {
+          let status = error?.data?.status;
+          let message = error?.data?.message;
           let errorMessage;
 
-          if(errorData.data) {
+          if(error.data) {
             errorMessage = `${status ? status : ''}: ${message ? message : ''}.`;
           }
           else {
@@ -74,7 +78,7 @@ const Register = () => {
           setErrors({ general: errorMessage });
         }
         else {
-          setErrors({ general: 'Register Failed' });
+          setErrors({ general: 'Register failed' });
         }
 
         errorRef?.current?.focus();
@@ -111,6 +115,7 @@ const Register = () => {
                   type="text"
                   placeholder="john_doe123"
                   value={formData.username}
+                  ref={usernameRef}
                   onChange={handleChange}
                   name="username"
                   isInvalid={errors.hasOwnProperty('username')}
@@ -201,9 +206,7 @@ const Register = () => {
               </p>
             </Form>
 
-            {errors && errors.hasOwnProperty('general') && (
-              <Alert variant="danger">{errors.general}</Alert>
-            )}
+            {errors && errors.hasOwnProperty('general') && <Alert variant="danger" className="mt-3 mb-0">{errors.general}</Alert>}
           </div>
         )}
       </section>
