@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.*;
 public class SongController {
     private final SongService songService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SongDTO> createSong(@RequestBody @Valid SongCreateRequest request) throws StatusException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SongDTO> createSong(@ModelAttribute @Valid SongCreateRequest request) throws StatusException {
         SongDTO songDTO = this.songService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(songDTO);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SongDTO> updateSong(@PathVariable Long id, @RequestBody @Valid SongUpdateRequest request) throws StatusException {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SongDTO> updateSong(@PathVariable Long id, @ModelAttribute @Valid SongUpdateRequest request) throws StatusException {
         SongDTO songDTO = this.songService.update(id, request);
         return ResponseEntity.ok(songDTO);
     }

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
 
   soundcloud.frontend.public:
@@ -58,16 +57,16 @@ services:
     networks:
       - sound_net
 
-#  soundcloud.audio.handler:
-#    build:
-#      dockerfile: Dockerfile
-#      context: ./backend/audio-handler
-#    container_name: soundcloud.audio.handler
-#    depends_on:
-#      - soundcloud.api
-#      - soundcloud.storage.minio
-#    networks:
-#      - sound_net
+  soundcloud.audio.handler:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend/audio-handler
+    container_name: soundcloud.audio.handler
+    depends_on:
+      - soundcloud.api
+      - soundcloud.storage.minio
+    networks:
+      - sound_net
 
   soundcloud.external.api.handler:
     build:

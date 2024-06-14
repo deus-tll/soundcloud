@@ -123,7 +123,7 @@ public class StorageMinioDriver implements StorageDriverInterface{
     }
 
     @Override
-    public boolean isFileExists(String bucketName, String path) throws StorageException {
+    public Boolean isFileExists(String bucketName, String path) throws StorageException {
         try {
             minioClient.statObject(StatObjectArgs.builder()
                     .bucket(bucketName)

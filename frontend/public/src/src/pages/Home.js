@@ -1,25 +1,11 @@
-import {Container, Nav, Navbar, NavLink} from "react-bootstrap";
+
 
 const Home = () => {
-    return (
-        <section>
-            <Navbar bg="light" expand="lg">
-                <Container>
-                    <Navbar.Brand href="/">Soundcloud</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto">
-                            <NavLink href="/performers">Performers</NavLink>
-                            <NavLink href="/songs">Songs</NavLink>
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
 
-            <section>
-                <h1>HOME</h1>
-            </section>
-        </section>
-    );
+  return (
+    <section>
+      <h1>HOME</h1>
+    </section>
+  );
 }
 export default Home

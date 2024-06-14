@@ -1,7 +1,7 @@
 package org.deus.src.listeners;
 
 import lombok.RequiredArgsConstructor;
-import org.deus.src.dtos.creatings.SongCreatingDTO;
+import org.deus.src.dtos.helpers.SongConvertingDTO;
 import org.deus.src.enums.SongStatus;
 import org.deus.src.exceptions.data.DataIsNotPresentException;
 import org.deus.src.exceptions.data.DataProcessingException;
@@ -24,51 +24,51 @@ public class ConvertSongRabbitMQListener {
     private final RabbitMQService rabbitMQService;
     private final ConvertSongService convertSongService;
     private final RestTemplate restTemplate;
-    private static final String UPDATE_SONG_STATUS_URL = "http://soundcloud.api/private-api/songs/%d/status";
+    private static final String UPDATE_SONG_STATUS_URL = "http://soundcloud.api:8080/private-api/songs/%d/status";
 
     private static final Logger logger = LoggerFactory.getLogger(ConvertSongRabbitMQListener.class);
 
     @RabbitListener(queues = "convert.song")
     public void convertSong(Message message) {
-        Optional<SongCreatingDTO> optionalSongCreatingDTO = this.rabbitMQService.receiveSongCreatingDTO(message);
+        Optional<SongConvertingDTO> optionalSongCreatingDTO = this.rabbitMQService.receiveSongConvertingDTO(message);
 
         if (optionalSongCreatingDTO.isEmpty()) {
-            logger.error(SongCreatingDTO.class.getName() + " was not present when trying to convert song");
+            logger.error(SongConvertingDTO.class.getName() + " was not present when trying to convert song");
             return;
         }
 
-        SongCreatingDTO songCreatingDTO = optionalSongCreatingDTO.get();
+        SongConvertingDTO songConvertingDTO = optionalSongCreatingDTO.get();
 
         try {
-            this.convertSongService.convertSong(songCreatingDTO.getUserId(), songCreatingDTO.getSongId(), songCreatingDTO.getFileId());
+            this.convertSongService.convertSong(songConvertingDTO.getUserId(), songConvertingDTO.getSongId(), songConvertingDTO.getFileId());
 
-            boolean isUpdated = updateSongStatus(songCreatingDTO.getSongId(), SongStatus.READY);
+            boolean isUpdated = updateSongStatus(songConvertingDTO.getSongId(), SongStatus.READY);
 
             if (isUpdated) {
                 this.rabbitMQService.sendWebsocketMessageDTO(
                         "websocket.message.send",
-                        songCreatingDTO.getUploaderUsername(),
-                        "/topic/song.ready." + songCreatingDTO.getSongId(),
+                        songConvertingDTO.getUploaderUsername(),
+                        "/topic/song.ready." + songConvertingDTO.getSongId(),
                         "Your song is ready!",
                         null);
             } else {
-                logger.error("Failed to update song status to READY for song with id \"" + songCreatingDTO.getSongId() + "\"");
+                logger.error("Failed to update song status to READY for song with id \"" + songConvertingDTO.getSongId() + "\"");
             }
         }
         catch (DataIsNotPresentException | DataProcessingException e) {
-            logger.error("Some problems have occurred while trying to convert song with id \"" + songCreatingDTO.getSongId() + "\"", e);
+            logger.error("Some problems have occurred while trying to convert song with id \"" + songConvertingDTO.getSongId() + "\"", e);
 
-            boolean isUpdated = updateSongStatus(songCreatingDTO.getSongId(), SongStatus.ERROR);
+            boolean isUpdated = updateSongStatus(songConvertingDTO.getSongId(), SongStatus.ERROR);
 
             if (isUpdated) {
                 this.rabbitMQService.sendWebsocketMessageDTO(
                         "websocket.message.send",
-                        songCreatingDTO.getUploaderUsername(),
+                        songConvertingDTO.getUploaderUsername(),
                         "/topic/error",
                         "Something went wrong while trying to prepare song. Please try later",
                         null);
             } else {
-                logger.error("Failed to update song status to ERROR for song with id \"" + songCreatingDTO.getSongId() + "\"");
+                logger.error("Failed to update song status to ERROR for song with id \"" + songConvertingDTO.getSongId() + "\"");
             }
         }
     }

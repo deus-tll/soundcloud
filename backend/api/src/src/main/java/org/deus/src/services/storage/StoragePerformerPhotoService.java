@@ -14,14 +14,25 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoragePerformerPhotoService {
     private final StorageDriverInterface storage;
-    private final String bucketName = "performers_photos";
+    private final String bucketName = "performers-photos";
     private static final Logger logger = LoggerFactory.getLogger(StoragePerformerPhotoService.class);
 
     private String buildPathToOriginalBytes(long performerId) {
         return "/" + performerId + "/originalBytes";
     }
-    private String buildPathToFile(long userId) {
-        return userId + "/photo.webp";
+    private String buildPathToFile(long performerId) {
+        return performerId + "/photo.webp";
+    }
+
+    public void putOriginalBytes(long performerId, byte[] bytes) throws DataSavingException {
+        try {
+            storage.put(bucketName, buildPathToOriginalBytes(performerId), bytes);
+        }
+        catch (StorageException e) {
+            String errorMessage = "Error while putting original bytes to store, bucket/container: \"" + bucketName + "\"";
+            logger.error(errorMessage, e);
+            throw new DataSavingException(errorMessage, e);
+        }
     }
 
     public void putNewBytesAsFile(long performerId, byte[] bytes) throws DataSavingException {
@@ -46,7 +57,7 @@ public class StoragePerformerPhotoService {
         }
     }
 
-    public String getPathToFile(long userId) {
-        return storage.getPublicUrl(bucketName, buildPathToFile(userId));
+    public String getPathToFile(long performerId) {
+        return storage.getPublicUrl(bucketName, buildPathToFile(performerId));
     }
 }

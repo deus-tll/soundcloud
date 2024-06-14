@@ -3,10 +3,11 @@ package org.deus.src.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.deus.src.dtos.helpers.PerformerPhotoConvertingDTO;
 import org.deus.src.dtos.creatings.SongCreatingDTO;
 import org.deus.src.dtos.fromModels.PerformerDTO;
 import org.deus.src.dtos.fromModels.UserDTO;
+import org.deus.src.dtos.helpers.PerformerPhotoConvertingDTO;
+import org.deus.src.dtos.helpers.SongCoverConvertingDTO;
 import org.deus.src.dtos.websocket.PayloadDTO;
 import org.deus.src.dtos.websocket.WebsocketMessageDTO;
 import org.deus.src.exceptions.message.MessageSendingException;
@@ -78,6 +79,14 @@ public class RabbitMQService {
 
     public Optional<PerformerPhotoConvertingDTO> receivePerformerPhotoConvertingDTO(Message message) {
         return this.deserializeMessage(message, PerformerPhotoConvertingDTO.class);
+    }
+
+    public void sendSongCoverConvertingDTO(String queueName, SongCoverConvertingDTO songCoverConvertingDTO) throws MessageSendingException {
+        this.serializeAndSendMessage(queueName, songCoverConvertingDTO, PerformerDTO.class);
+    }
+
+    public Optional<SongCoverConvertingDTO> receiveSongCoverConvertingDTO(Message message) {
+        return this.deserializeMessage(message, SongCoverConvertingDTO.class);
     }
 
     public void sendSongCreatingDTO(String queueName, SongCreatingDTO songCreatingDTO) throws MessageSendingException {

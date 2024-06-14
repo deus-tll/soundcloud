@@ -12,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +28,7 @@ public class UploadController {
     private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
     @RequestMapping(
-            value = "/file",
+            value = {"/file", "/file/**"},
             method = {
                     RequestMethod.POST, RequestMethod.PATCH,
                     RequestMethod.HEAD, RequestMethod.DELETE,
@@ -39,14 +41,16 @@ public class UploadController {
     }
 
     @PostMapping("/request")
-    public ResponseEntity<String> requestUpload() {
+    public ResponseEntity<Map<String, String>> requestUpload() {
         String fileId = UUID.randomUUID().toString();
-        return new ResponseEntity<>(fileId, HttpStatus.CREATED);
+        Map<String, String> response = new HashMap<>();
+        response.put("fileId", fileId);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/check-file/{fileId}")
-    public ResponseEntity<?> checkFile(@PathVariable String fileId) throws StatusException {
-        boolean isFileExists = uploadService.checkFile(fileId);
+    public ResponseEntity<Boolean> checkFile(@PathVariable String fileId) throws StatusException {
+        Boolean isFileExists = uploadService.checkFile(fileId);
         return new ResponseEntity<>(isFileExists, HttpStatus.OK);
     }
 

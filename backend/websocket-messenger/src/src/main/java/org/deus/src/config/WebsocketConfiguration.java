@@ -19,15 +19,20 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -39,9 +44,32 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
     private final String authServiceUrl;
     private static final Logger logger = LoggerFactory.getLogger(WebsocketConfiguration.class);
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http.csrf(AbstractHttpConfigurer::disable)
+                // Disabling CORS (allowing requests from all domains)
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration corsConfiguration = new CorsConfiguration();
+                    corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+                    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfiguration.setAllowedHeaders(List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    return corsConfiguration;
+                }))
+                // Configuring endpoint access
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/websocket-private/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        return http.build();
+    }
+
     public WebsocketConfiguration() {
         this.restTemplate = new RestTemplate();
-        this.authServiceUrl = "http://soundcloud.api/private-api/auth/validate-token";
+        this.authServiceUrl = "http://soundcloud.api:8080/private-api/auth/validate-token";
     }
 
     @Override
@@ -83,6 +111,8 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
                                 UserDetails.class
                         );
 
+                        System.out.println(response);
+
                         if (response.getStatusCode().is2xxSuccessful()) {
                             UserDetails userDetails = response.getBody();
 
@@ -98,8 +128,10 @@ public class WebsocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
                             accessor.setUser(usernamePasswordAuthenticationToken);
                         } else {
-                            throw new InsufficientAuthenticationException("Authorization header is missing");
+
                         }
+                    } else {
+                        throw new InsufficientAuthenticationException("Authorization header is missing");
                     }
                 }
 

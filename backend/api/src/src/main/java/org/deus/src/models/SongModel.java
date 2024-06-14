@@ -39,7 +39,7 @@ public class SongModel extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SongStatus status = SongStatus.PROCESSING;
 
-    public SongDTO mapToSongDTO(String url) {
+    public SongDTO mapToSongDTO(String songUrl, String coverUrl) {
         return new SongDTO(
                 this.getId(),
                 this.getName(),
@@ -51,7 +51,8 @@ public class SongModel extends BaseEntity {
                                 null))
                         .collect(Collectors.toSet()),
                 this.getStatus(),
-                url
+                songUrl,
+                coverUrl
         );
     }
 }

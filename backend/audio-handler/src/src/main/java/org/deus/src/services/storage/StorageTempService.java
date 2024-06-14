@@ -16,7 +16,7 @@ import java.util.Optional;
 public class StorageTempService {
     private final StorageDriverInterface storage;
     private static final Logger logger = LoggerFactory.getLogger(StorageTempService.class);
-    private final String bucketName = "temp_files";
+    private final String bucketName = "temp-files";
 
     private String buildPath(long userId, String fileId) {
         return "/" + userId + "/" + fileId + "/originalBytes";

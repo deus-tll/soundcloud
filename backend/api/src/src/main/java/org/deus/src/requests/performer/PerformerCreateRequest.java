@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -20,4 +21,8 @@ public class PerformerCreateRequest {
     @Size(min = 1, max = 50, message = "The name must be between 1 and 50 characters long")
     @NotBlank(message = "The name cannot be empty")
     private String name;
+
+    @Schema(description = "Performer's photo")
+    @NotNull(message = "The photo cannot be empty")
+    private MultipartFile photo;
 }

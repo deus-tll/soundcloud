@@ -34,11 +34,11 @@ public class PerformerModel extends BaseEntity {
     @Schema(description = "Performer's songs")
     private Set<SongModel> songs;
 
-    public PerformerDTO mapToPerformerDTO() {
+    public PerformerDTO mapToPerformerDTO(String photoUrl) {
         return new PerformerDTO(
                 this.getId(),
                 this.getName(),
-                null
+                photoUrl
         );
     }
 }

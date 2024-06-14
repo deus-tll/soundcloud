@@ -1,4 +1,4 @@
-package org.deus.src.dtos.creatings;
+package org.deus.src.dtos.helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SongCreatingDTO {
-    private Long userId;
-    private Long songId;
-    private String fileId;
+public class PerformerPhotoConvertingDTO {
+    private Long performerId;
     private String uploaderUsername;
 }

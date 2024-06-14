@@ -49,6 +49,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/*").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/private-api/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/docs/**").permitAll()
                         .anyRequest().authenticated()
                 )

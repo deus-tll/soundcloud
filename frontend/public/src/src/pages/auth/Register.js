@@ -6,10 +6,9 @@ import {Alert, Form, Button} from "react-bootstrap";
 import {useRegisterMutation} from "../../services/auth/authApiSliceService";
 import {logOut, setCredentials} from "../../services/auth/authSliceService";
 
-// import {avatarIsReady} from "../../providers/socket/socketHandlers";
-// import {useSocket} from "../../providers/socket/SocketProvider";
-
 import AuthWrapper from "../../components/auth/AuthWrapper";
+// import {useSocket} from "../../providers/socket/SocketProvider";
+// import {toastSuccess} from "../../helpers/toastNotification";
 
 
 const Register = () => {
@@ -20,6 +19,7 @@ const Register = () => {
   const errorRef = useRef();
 
   //const { socketConnection } = useSocket();
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -33,10 +33,16 @@ const Register = () => {
 
   // useEffect(() => {
   //   const eventName = 'app/topic/avatar.ready';
-  //   if(socketConnection.isConnected){
-  //     socketConnection.subscribeToTopic(eventName, avatarIsReady);
+  //   if (socketConnection.isConnected) {
+  //     ((socketConnection) => {
+  //       const subscription = socketConnection.subscribeToTopic(eventName, (data) => {
+  //         console.log('Avatar is ready:', data);
+  //         toastSuccess(`Avatar is ready! Message: ${data.message}`, 5000);
+  //         socketConnection.unsubscribeFromTopic(subscription);
+  //       });
+  //     })(socketConnection);
   //   }
-  // }, [socketConnection, dispatch]);
+  // }, [socketConnection]);
 
   useEffect(() => {
     dispatch(logOut());
@@ -60,7 +66,7 @@ const Register = () => {
 
         dispatch(setCredentials({ user: user, accessToken: accessToken, rememberMe: true }));
 
-        navigate('/welcome');
+        navigate('/profile');
       }
       catch (error) {
         if(error.status) {

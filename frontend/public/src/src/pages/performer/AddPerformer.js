@@ -28,7 +28,7 @@ const AddPerformer = () => {
 
         try {
             await addPerformer(formData).unwrap();
-            navigate('/performers');
+            navigate('/performers', { state: { refetch: true } });
         } catch (error) {
             if(error.status) {
                 let status = error?.data?.status;

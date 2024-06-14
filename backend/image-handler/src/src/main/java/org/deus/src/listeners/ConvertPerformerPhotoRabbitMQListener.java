@@ -38,22 +38,26 @@ public class ConvertPerformerPhotoRabbitMQListener {
 
             this.convertPerformerPhotoService.convertPerformerPhoto(performerPhotoConvertingDTO.getPerformerId(), targetWidth, targetHeight);
 
-            this.rabbitMQService.sendWebsocketMessageDTO(
-                    "websocket.message.send",
-                    performerPhotoConvertingDTO.getUploaderUsername(),
-                    "/topic/performer_photo.ready",
-                    "Performer's photo is ready!",
-                    null);
+            if (!performerPhotoConvertingDTO.getUploaderUsername().isEmpty()) {
+                this.rabbitMQService.sendWebsocketMessageDTO(
+                        "websocket.message.send",
+                        performerPhotoConvertingDTO.getUploaderUsername(),
+                        "/topic/performer_photo.ready",
+                        "Performer's photo is ready!",
+                        null);
+            }
         }
         catch (DataIsNotPresentException | DataProcessingException e) {
             logger.error("Some problems have occurred while trying to convert performer photo for performer with id \"" + performerPhotoConvertingDTO.getPerformerId() + "\"", e);
 
-            this.rabbitMQService.sendWebsocketMessageDTO(
-                    "websocket.message.send",
-                    performerPhotoConvertingDTO.getUploaderUsername(),
-                    "/topic/error",
-                    "Something went wrong while trying to prepare performer's photo. Please try later",
-                    null);
+            if (!performerPhotoConvertingDTO.getUploaderUsername().isEmpty()) {
+                this.rabbitMQService.sendWebsocketMessageDTO(
+                        "websocket.message.send",
+                        performerPhotoConvertingDTO.getUploaderUsername(),
+                        "/topic/error",
+                        "Something went wrong while trying to prepare performer photo. Please try later",
+                        null);
+            }
         }
     }
 }

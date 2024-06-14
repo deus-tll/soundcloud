@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
@@ -17,14 +18,14 @@ public class SongCreateRequest {
     @NotBlank(message = "The name cannot be empty")
     private String name;
 
-    @Schema(description = "ID of the uploader user")
-    @NotNull(message = "The uploader ID cannot be null")
-    private Long uploaderId;
-
     @Schema(description = "IDs of the performers")
     private Set<Long> performerIds;
 
-    @Schema(description = "")
+    @Schema(description = "FileId in temporary storage")
     @NotBlank(message = "The fileId cannot be empty")
     private String fileId;
+
+    @Schema(description = "Song's photo cover")
+    @NotNull(message = "The cover cannot be empty")
+    private MultipartFile cover;
 }

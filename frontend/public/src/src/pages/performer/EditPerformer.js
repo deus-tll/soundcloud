@@ -36,7 +36,7 @@ const EditPerformer = () => {
 
         try {
             await updatePerformer({ id, data: formData }).unwrap();
-            navigate('/performers');
+            navigate('/performers', { state: { refetch: true } });
         } catch (error) {
             if(error.status) {
                 let status = error?.data?.status;

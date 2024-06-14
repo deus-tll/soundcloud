@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,7 @@ public class PerformerUpdateRequest {
     @Schema(description = "Performer's name", example = "John Doe")
     @Size(min = 1, max = 50, message = "The name must be between 1 and 50 characters long")
     private String name;
+
+    @Schema(description = "Performer's photo")
+    private MultipartFile photo;
 }

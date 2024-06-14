@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useDeletePerformerMutation, useGetPerformersQuery} from "../../services/performer/performerApiSliceService";
 import {Alert, Button, Container, Pagination, Table} from "react-bootstrap";
 import { LinkContainer } from 'react-router-bootstrap';
@@ -7,13 +7,20 @@ import DeleteModal from "../../components/reusable/DeleteModal";
 
 const Performers = () => {
     const [page, setPage] = useState(0);
-    const { data, error: errorGettingPerformers, isLoading } = useGetPerformersQuery({ page });
+    const { data, error: errorGettingPerformers, isLoading, refetch } = useGetPerformersQuery({ page });
     const [deletePerformer] = useDeletePerformerMutation();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedPerformer, setSelectedPerformer] = useState(null);
 
     const performers = data?.content || [];
     const totalPages = data?.totalPages || 1;
+
+    useEffect(() => {
+        if (location.state?.refetch) {
+            refetch();
+            window.history.replaceState({}, document.title)
+        }
+    }, [location.state, refetch]);
 
     const handleDelete = (performer) => {
         setSelectedPerformer(performer);
@@ -24,6 +31,7 @@ const Performers = () => {
         try {
             await deletePerformer(selectedPerformer.id);
             setShowDeleteModal(false);
+            refetch();
         } catch (error) {
             let errorMessage;
 

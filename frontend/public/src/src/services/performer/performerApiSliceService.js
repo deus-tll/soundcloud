@@ -14,24 +14,24 @@ export const performerApiSliceService = apiSliceService.injectEndpoints({
                 method: 'GET'
             })
         }),
+        getAllPerformers: builder.query({
+            query: () => ({
+                url: `/performers/all`,
+                method: 'GET',
+            })
+        }),
         addPerformer: builder.mutation({
             query: data => ({
                 url: '/performers',
                 method: 'POST',
-                body: data,
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                body: data
             })
         }),
         updatePerformer: builder.mutation({
             query: ({ id, data }) => ({
                 url: `/performers/${id}`,
                 method: 'PUT',
-                body: data,
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                body: data
             })
         }),
         deletePerformer: builder.mutation({
@@ -46,6 +46,7 @@ export const performerApiSliceService = apiSliceService.injectEndpoints({
 export const {
     useGetPerformersQuery,
     useGetPerformerByIdQuery,
+    useGetAllPerformersQuery,
     useAddPerformerMutation,
     useUpdatePerformerMutation,
     useDeletePerformerMutation

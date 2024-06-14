@@ -46,7 +46,7 @@ public class StorageS3Driver implements StorageDriverInterface {
     }
 
     @Override
-    public boolean isFileExists(String bucketName, String path) throws StorageException {
+    public Boolean isFileExists(String bucketName, String path) throws StorageException {
         try {
             s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(bucketName)

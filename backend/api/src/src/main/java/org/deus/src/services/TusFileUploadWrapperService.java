@@ -25,7 +25,7 @@ public class TusFileUploadWrapperService {
     private final Path tusUploadDirectory;
     private static final Logger logger = LoggerFactory.getLogger(TusFileUploadWrapperService.class);
 
-    public TusFileUploadWrapperService(TusFileUploadService tusFileUploadService, StorageTempService storageTempService, UserService userService, RabbitMQService rabbitMQService, TusProperties tusProperties) {
+    public TusFileUploadWrapperService(TusFileUploadService tusFileUploadService, TusProperties tusProperties) {
         this.tusFileUploadService = tusFileUploadService;
         this.tusUploadDirectory = Path.of(tusProperties.getUploadDirectory());
     }

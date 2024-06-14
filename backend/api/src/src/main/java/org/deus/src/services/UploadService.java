@@ -36,15 +36,15 @@ public class UploadService {
     public void processUpload(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
         tusFileUploadWrapperService.processRequest(servletRequest, servletResponse);
         String uploadURI = servletRequest.getRequestURI();
-        Optional<UploadInfo> uploadInfoObject = this.tusFileUploadWrapperService.getUploadInfo(uploadURI);
 
-        if (uploadInfoObject.isEmpty()) {
+        Optional<UploadInfo> optionalUploadInfo = this.tusFileUploadWrapperService.getUploadInfo(uploadURI);
+
+        if (optionalUploadInfo.isEmpty()) {
             logger.error("Couldn't get UploadInfo due to some problems");
             return;
         }
 
-        UploadInfo uploadInfo = uploadInfoObject.get();
-        Map<String, String> metadata = uploadInfo.getMetadata();
+        UploadInfo uploadInfo = optionalUploadInfo.get();
 
         if (uploadInfo.isUploadInProgress()) {
             logger.info("UPLOAD!!!! - Upload Is In Progress. To the next packet!");
@@ -52,6 +52,7 @@ public class UploadService {
         }
 
         UserModel user = userService.getCurrentUser();
+        Map<String, String> metadata = uploadInfo.getMetadata();
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -77,7 +78,7 @@ public class UploadService {
                         "websocket.message.send",
                         user.getUsername(),
                         "/topic/file.upload.ready." + fileId,
-                        "Your avatar is ready!",
+                        "Temporary file has been uploaded",
                         null);
             }
             catch (IOException | DataNotFoundException | DataProcessingException e) {
@@ -105,7 +106,7 @@ public class UploadService {
         }
     }
 
-    public boolean checkFile(String fileId) throws StatusException {
+    public Boolean checkFile(String fileId) throws StatusException {
         try {
             return this.storageTempService.isFileExists(userService.getCurrentUser().getId(), fileId);
         } catch (DataProcessingException e) {

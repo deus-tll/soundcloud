@@ -51,7 +51,7 @@ const Login = () => {
 
         dispatch(setCredentials({ user, accessToken: accessToken, rememberMe }));
 
-        navigate('/welcome');
+        navigate('/profile');
       }
       catch (error) {
         if(error.status) {

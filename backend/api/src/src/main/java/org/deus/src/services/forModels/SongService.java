@@ -1,9 +1,11 @@
 package org.deus.src.services.forModels;
 
 import lombok.RequiredArgsConstructor;
-import org.deus.src.dtos.creatings.SongCreatingDTO;
 import org.deus.src.dtos.fromModels.SongDTO;
+import org.deus.src.dtos.helpers.SongConvertingDTO;
+import org.deus.src.dtos.helpers.SongCoverConvertingDTO;
 import org.deus.src.exceptions.StatusException;
+import org.deus.src.exceptions.data.DataSavingException;
 import org.deus.src.exceptions.message.MessageSendingException;
 import org.deus.src.models.PerformerModel;
 import org.deus.src.models.SongModel;
@@ -15,19 +17,22 @@ import org.deus.src.requests.song.SongStatusRequest;
 import org.deus.src.requests.song.SongUpdateRequest;
 import org.deus.src.services.RabbitMQService;
 import org.deus.src.services.auth.UserService;
+import org.deus.src.services.storage.StorageSongCoverService;
 import org.deus.src.services.storage.StorageSongService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,10 +42,15 @@ public class SongService {
     private final RabbitMQService rabbitMQService;
     private final UserService userService;
     private final StorageSongService storageSongService;
+    private final StorageSongCoverService storageSongCoverService;
+    private static final Logger logger = LoggerFactory.getLogger(SongService.class);
 
     @CacheEvict(value = "songs", allEntries = true)
     public SongDTO create(SongCreateRequest request) throws StatusException {
         UserModel uploader = userService.getCurrentUser();
+
+        System.out.println(request.getPerformerIds());
+
         Set<PerformerModel> performers = getPerformersFromIds(request.getPerformerIds());
 
         if (performers.isEmpty()) {
@@ -49,7 +59,6 @@ public class SongService {
 
         SongModel song = new SongModel();
         song.setName(request.getName());
-        song.setName(request.getFileId());
         song.setUploader(uploader);
         song.setPerformers(performers);
 
@@ -62,10 +71,12 @@ public class SongService {
             throw new StatusException("Couldn't create object of song in database", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        SongCreatingDTO songCreatingDTO = new SongCreatingDTO(uploader.getId(), savedSong.getId(), request.getFileId(), uploader.getUsername());
+        SongConvertingDTO songConvertingDTO = new SongConvertingDTO(uploader.getId(), savedSong.getId(), request.getFileId(), uploader.getUsername());
+
+        convertSongCover(uploader, savedSong.getId(), request.getCover());
 
         try {
-            this.rabbitMQService.sendSongCreatingDTO("convert.song", songCreatingDTO);
+            this.rabbitMQService.sendSongConvertingDTO("convert.song", songConvertingDTO);
         } catch (MessageSendingException e) {
             this.rabbitMQService.sendWebsocketMessageDTO(
                     "websocket.message.send",
@@ -75,12 +86,13 @@ public class SongService {
                     null);
         }
 
-        return savedSong.mapToSongDTO(this.getSongUrl(savedSong.getId()));
+        return savedSong.mapToSongDTO(this.getSongUrl(savedSong.getId()), storageSongCoverService.getPathToFile(savedSong.getId()));
     }
 
     @CacheEvict(value = "songs", allEntries = true)
     public SongDTO update(Long id, SongUpdateRequest request) throws StatusException {
         SongModel song = songRepository.findById(id).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
+        UserModel uploader = userService.getCurrentUser();
 
         if (request.getName() != null && !request.getName().isEmpty()) {
             song.setName(request.getName());
@@ -94,20 +106,59 @@ public class SongService {
             song.setPerformers(performers);
         }
 
+        if (request.getFileId() != null && !request.getFileId().isEmpty()) {
+            SongConvertingDTO songConvertingDTO = new SongConvertingDTO(uploader.getId(), song.getId(), request.getFileId(), uploader.getUsername());
+            try {
+                this.rabbitMQService.sendSongConvertingDTO("convert.song", songConvertingDTO);
+            } catch (MessageSendingException e) {
+                this.rabbitMQService.sendWebsocketMessageDTO(
+                        "websocket.message.send",
+                        uploader.getUsername(),
+                        "/topic/error",
+                        "Some error occurred while sending your song for preparation",
+                        null);
+            }
+        }
+
         SongModel updatedSong = songRepository.save(song);
-        return updatedSong.mapToSongDTO(this.getSongUrl(updatedSong.getId()));
+
+        Long songId = song.getId();
+
+        if (request.getCover() != null) {
+            convertSongCover(uploader, songId, request.getCover());
+        }
+
+        return updatedSong.mapToSongDTO(this.getSongUrl(songId), storageSongCoverService.getPathToFile(songId));
     }
 
-    @Cacheable(value = "performers", key = "#id")
+    private void convertSongCover(UserModel uploader, Long songId, MultipartFile cover) {
+        try {
+            storageSongCoverService.putOriginalBytes(songId, cover.getBytes());
+
+            rabbitMQService.sendSongCoverConvertingDTO("convert.song_cover", new SongCoverConvertingDTO(songId, uploader.getUsername()));
+        }
+        catch (IOException | DataSavingException | MessageSendingException e) {
+            String message = "Failed to upload song cover file! Try later with update.";
+            logger.error(message, e);
+            this.rabbitMQService.sendWebsocketMessageDTO(
+                    "websocket.message.send",
+                    uploader.getUsername(),
+                    "/topic/error",
+                    message,
+                    null);
+        }
+    }
+
+    @Cacheable(value = "songs", key = "#id")
     public SongDTO getById(Long id) throws StatusException {
         Optional<SongModel> optionalSongModel = songRepository.findById(id);
-        return optionalSongModel.map(songModel -> songModel.mapToSongDTO(this.getSongUrl(songModel.getId()))).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
+        return optionalSongModel.map(songModel -> songModel.mapToSongDTO(this.getSongUrl(songModel.getId()), storageSongCoverService.getPathToFile(songModel.getId()))).orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
     }
 
-    @Cacheable(value = "performers", key = "#pageable")
+    @Cacheable(value = "songs", key = "#pageable")
     public Page<SongDTO> getAll(Pageable pageable) {
         Page<SongModel> songs = songRepository.findAll(pageable);
-        return songs.map(songModel -> songModel.mapToSongDTO(this.getSongUrl(songModel.getId())));
+        return songs.map(songModel -> songModel.mapToSongDTO(this.getSongUrl(songModel.getId()), storageSongCoverService.getPathToFile(songModel.getId())));
     }
 
     @CacheEvict(value = "songs", allEntries = true)
@@ -119,6 +170,7 @@ public class SongService {
         songRepository.deleteById(id);
     }
 
+    @CacheEvict(value = "songs", allEntries = true)
     public void updateStatus(Long id, SongStatusRequest request) throws StatusException {
         SongModel song = songRepository.findById(id)
                 .orElseThrow(() -> new StatusException("Song not found with id: " + id, HttpStatus.NOT_FOUND));
@@ -131,6 +183,7 @@ public class SongService {
         Set<PerformerModel> performers = new HashSet<>();
         if (performerIds != null) {
             for (Long performerId : performerIds) {
+                System.out.println("performerId: " + performerId);
                 Optional<PerformerModel> performerOptional = performerRepository.findById(performerId);
                 performerOptional.ifPresent(performers::add);
             }

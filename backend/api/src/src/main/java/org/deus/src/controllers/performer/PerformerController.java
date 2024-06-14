@@ -14,20 +14,22 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/performers")
 public class PerformerController {
     private final PerformerService performerService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PerformerDTO> createPerformer(@RequestBody @Valid PerformerCreateRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PerformerDTO> createPerformer(@ModelAttribute @Valid PerformerCreateRequest request) {
         PerformerDTO performerDTO = this.performerService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(performerDTO);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PerformerDTO> updatePerformer(@PathVariable Long id, @RequestBody @Valid PerformerUpdateRequest request) throws StatusException {
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PerformerDTO> updatePerformer(@PathVariable Long id, @ModelAttribute @Valid PerformerUpdateRequest request) throws StatusException {
         PerformerDTO updatedPerformer = this.performerService.update(id, request);
         return ResponseEntity.ok(updatedPerformer);
     }
@@ -41,6 +43,12 @@ public class PerformerController {
     @GetMapping
     public ResponseEntity<Page<PerformerDTO>> getAllPerformers(Pageable pageable) {
         Page<PerformerDTO> performers = this.performerService.getAll(pageable);
+        return ResponseEntity.ok(performers);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<PerformerDTO>> getAllPerformers() {
+        List<PerformerDTO> performers = this.performerService.getAllPerformers();
         return ResponseEntity.ok(performers);
     }
 

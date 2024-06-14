@@ -28,7 +28,7 @@ public class AvatarService {
 
             rabbitMQService.sendUserDTO("convert.avatar", user.mapUserToDTO((String) null));
 
-            return new ResponseEntity<>("Process of updating avatar has started. Please wait...", HttpStatus.OK);
+            return ResponseEntity.ok("Process of updating avatar has started. Please wait...");
         }
         catch (IOException | DataSavingException | MessageSendingException e) {
             String message = "Failed to upload avatar file!";
