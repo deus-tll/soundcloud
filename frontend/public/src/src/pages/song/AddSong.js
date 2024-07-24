@@ -55,6 +55,7 @@ const AddSong = () => {
   const checkFileStatus = async (fileId) => {
     const interval = setInterval(async () => {
       try {
+        console.log(fileId);
         const result = await checkFileRefetch({ fileId });
         if (result.data) {
           clearInterval(interval);

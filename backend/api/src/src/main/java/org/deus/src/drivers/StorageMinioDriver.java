@@ -31,7 +31,7 @@ public class StorageMinioDriver implements StorageDriverInterface{
             for (Bucket bucket : minioClient.listBuckets()) {
                 buckets.add(bucket.name());
             }
-        } catch (Exception e) {
+        } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Error caching existing buckets", e);
         }
         return buckets;
@@ -43,7 +43,7 @@ public class StorageMinioDriver implements StorageDriverInterface{
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
                 setBucketPolicyPublic(bucketName);
                 existingBuckets.add(bucketName);
-            } catch (Exception e) {
+            } catch (MinioException | InvalidKeyException | IOException | NoSuchAlgorithmException e) {
                 throw new RuntimeException("Error creating bucket: " + bucketName, e);
             }
         } else {

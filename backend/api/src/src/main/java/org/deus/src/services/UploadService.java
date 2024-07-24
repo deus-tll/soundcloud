@@ -108,6 +108,7 @@ public class UploadService {
 
     public Boolean checkFile(String fileId) throws StatusException {
         try {
+            System.out.println(fileId);
             return this.storageTempService.isFileExists(userService.getCurrentUser().getId(), fileId);
         } catch (DataProcessingException e) {
             throw new StatusException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

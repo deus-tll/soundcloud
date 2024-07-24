@@ -4,6 +4,7 @@ import {Alert, Button, Container, Pagination, Table} from "react-bootstrap";
 import { LinkContainer } from 'react-router-bootstrap';
 import {toast} from "react-toastify";
 import DeleteModal from "../../components/reusable/DeleteModal";
+import {useLocation} from "react-router-dom";
 
 const Performers = () => {
     const [page, setPage] = useState(0);
@@ -11,6 +12,7 @@ const Performers = () => {
     const [deletePerformer] = useDeletePerformerMutation();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedPerformer, setSelectedPerformer] = useState(null);
+    const location = useLocation();
 
     const performers = data?.content || [];
     const totalPages = data?.totalPages || 1;
